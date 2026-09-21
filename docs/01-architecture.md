@@ -64,7 +64,7 @@ docs/
 {
   "schemaVersion": 1,
   "capturedAt": "2026-09-21T04:12:33Z",
-  "location": { "lat": 35.5372, "lon": 129.3167, "accuracyM": 12, "geohash": "wy7ux5k2" },
+  "location": { "lat": 37.5665, "lon": 126.9780, "accuracyM": 12, "geohash": "wydm9qy8" },
   "calibration": {
     "patchFound": true,        // 기준 패치를 찾았는가
     "deltaEAfter": 2.4,        // 보정 후 잔차 색차

@@ -12,7 +12,7 @@ NOW = datetime.now(timezone.utc)
 
 BASE = {
     "captured_at": NOW.isoformat(),
-    "location": {"lat": 35.5372, "lon": 129.3167, "accuracy_m": 8, "geohash": "wy7ux5k2"},
+    "location": {"lat": 37.5665, "lon": 126.9780, "accuracy_m": 8, "geohash": "wydm9qy8"},
     "calibration": {"patch_found": True, "delta_e_after": 1.2, "quality": "good"},
     "detection": {"engine": "classic@1", "cracks": [{
         "width_mm": 0.84, "width_ci_mm": [0.62, 1.10], "length_mm": 312, "orientation_deg": 71,
@@ -94,7 +94,7 @@ def test_different_wall_nearby_is_a_new_site():
 
 def test_same_photo_far_away_is_flagged_as_reused():
     report()
-    far = {"lat": 37.5665, "lon": 126.9780, "accuracy_m": 8, "geohash": "wydm9qy2"}
+    far = {"lat": 38.0, "lon": 127.5, "accuracy_m": 8, "geohash": "wyf8jmdw"}  # 약 70km 떨어진 곳
     r = report("dev-b", location=far)
     assert "PHOTO_REUSED_ELSEWHERE" in codes(r)
     assert r.json()["state"] == "held"

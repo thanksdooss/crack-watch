@@ -35,6 +35,8 @@
     "../shared/pipeline.json"
   ],
   "exclude": [
-    "src/**/*.test.ts"
+    "src/**/*.test.ts",
+    "e2e",
+    "playwright.config.ts"
   ]
 }

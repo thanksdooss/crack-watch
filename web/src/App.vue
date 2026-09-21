@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, shallowRef } from 'vue'
+import { defineAsyncComponent, ref, shallowRef } from 'vue'
 import { loadImage, runAnalysis } from './lib/analyzer'
 import type { Analysis } from './vision/analyze'
-import AdminView from './views/AdminView.vue'
 import HomeView from './views/HomeView.vue'
-import MapView from './views/MapView.vue'
+// 지도(Leaflet)·관리자 화면은 필요할 때 불러온다 — 분석만 하는 시민이 받을 필요 없다
+const MapView = defineAsyncComponent(() => import('./views/MapView.vue'))
+const AdminView = defineAsyncComponent(() => import('./views/AdminView.vue'))
 import ReportView from './views/ReportView.vue'
 import ResultView from './views/ResultView.vue'
 

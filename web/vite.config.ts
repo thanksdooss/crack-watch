@@ -41,9 +41,22 @@ export default defineConfig({
         icons: [],
       },
       workbox: {
-        // 모델·OpenCV 같은 큰 정적 자산까지 캐시한다(오프라인에서 검출이 돌아야 한다).
-        globPatterns: ['**/*.{js,css,html,wasm,onnx}'],
-        maximumFileSizeToCacheInBytes: 30 * 1024 * 1024,
+        // 앱 껍데기만 미리 받는다. 모델(6MB)과 실행기(11MB)는 처음 분석할 때 받아서 캐시한다 —
+        // 처음엔 전부 미리 받게 했는데, 모바일 데이터로 여는 시민에게 첫 방문 17MB는 과하다.
+        globPatterns: ['**/*.{js,css,html,svg,webmanifest}'],
+        globIgnores: ['**/ort/**'],
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => /\/(models|ort)\//.test(url.pathname),
+            handler: 'CacheFirst',
+            options: { cacheName: 'crack-model', expiration: { maxEntries: 8 } },
+          },
+          {
+            urlPattern: ({ url }) => url.pathname.includes('/samples/'),
+            handler: 'StaleWhileRevalidate',
+            options: { cacheName: 'crack-samples' },
+          },
+        ],
       },
     }),
   ],

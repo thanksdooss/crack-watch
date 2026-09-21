@@ -27,3 +27,7 @@ web/public/ort/
 
 # 배포할 모델만 예외 (학습 가중치 배포 — 데이터셋 이미지는 여전히 올리지 않는다)
 !web/public/models/*.onnx
+
+# 테스트 산출물
+web/test-results/
+web/playwright-report/

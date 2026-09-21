@@ -21,3 +21,9 @@ ml/runs/
 # 빌드 부산물
 *.egg-info/
 web/dist/
+
+# 웹 실행 파일 복사본 (scripts/copy-runtime.mjs가 만든다)
+web/public/ort/
+
+# 배포할 모델만 예외 (학습 가중치 배포 — 데이터셋 이미지는 여전히 올리지 않는다)
+!web/public/models/*.onnx

@@ -19,5 +19,5 @@ except ImportError:  # pragma: no cover
 
 
 def workers() -> int:
-    """병렬 워커 수: 코어의 절반. 이 기계는 개발자가 동시에 쓰고 있다(화상회의 등)."""
-    return max(1, (os.cpu_count() or 2) // 2)
+    """병렬 워커 수: 코어의 절반(CRACK_WORKERS로 덮어쓰기). 이 기계는 개발자가 동시에 쓰고 있다."""
+    return int(os.environ.get("CRACK_WORKERS") or max(1, (os.cpu_count() or 2) // 2))

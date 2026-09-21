@@ -1,0 +1,303 @@
+[
+ {
+  "gps_sigma_m": 3.0,
+  "seeds": 5,
+  "bad_held_rate": 0.8266666666666665,
+  "bad_filtered_rate": 0.8266666666666665,
+  "convincing_prank_held_rate": 0.0,
+  "duplicate_merged_rate": 1.0,
+  "legit_wrongly_held_rate": 0.002,
+  "legit_wrongly_merged_rate": 0.0,
+  "followup_link_rate": 0.6994503806485373,
+  "mixed_sites": 0.0,
+  "per_kind_held": {
+   "prank_junk": 0.85,
+   "prank_reused": 1.0,
+   "wrong_building": 0.3333333333333333,
+   "flood": 1.0,
+   "prank_convincing": 0.0
+  },
+  "example": {
+   "gps_sigma_m": 3.0,
+   "n_events": 225,
+   "by_kind": {
+    "corroborate": {
+     "pending": 25
+    },
+    "double_tap": {
+     "pending": 3,
+     "merged": 16
+    },
+    "first": {
+     "pending": 47,
+     "merged": 3
+    },
+    "flood": {
+     "held": 25
+    },
+    "followup": {
+     "pending": 37
+    },
+    "prank_convincing": {
+     "pending": 10
+    },
+    "prank_junk": {
+     "held": 16,
+     "pending": 4
+    },
+    "prank_reused": {
+     "held": 15
+    },
+    "viral": {
+     "merged": 9
+    },
+    "wrong_building": {
+     "held": 7,
+     "pending": 8
+    }
+   },
+   "bad_held_rate": 0.84,
+   "bad_filtered_rate": 0.84,
+   "convincing_prank_held_rate": 0.0,
+   "duplicate_merged_rate": 1.0,
+   "legit_wrongly_held_rate": 0.0,
+   "legit_wrongly_merged_rate": 0.0,
+   "followup_link_rate": 0.6774193548387096,
+   "mixed_sites": 0.0,
+   "per_kind_held": {
+    "prank_junk": 0.8,
+    "prank_reused": 1.0,
+    "wrong_building": 0.4666666666666667,
+    "flood": 1.0,
+    "prank_convincing": 0.0
+   }
+  }
+ },
+ {
+  "gps_sigma_m": 6.0,
+  "seeds": 5,
+  "bad_held_rate": 0.8266666666666665,
+  "bad_filtered_rate": 0.8266666666666665,
+  "convincing_prank_held_rate": 0.0,
+  "duplicate_merged_rate": 1.0,
+  "legit_wrongly_held_rate": 0.002,
+  "legit_wrongly_merged_rate": 0.0,
+  "followup_link_rate": 0.6929987677453114,
+  "mixed_sites": 0.0,
+  "per_kind_held": {
+   "prank_junk": 0.85,
+   "prank_reused": 1.0,
+   "wrong_building": 0.3333333333333333,
+   "flood": 1.0,
+   "prank_convincing": 0.0
+  },
+  "example": {
+   "gps_sigma_m": 6.0,
+   "n_events": 225,
+   "by_kind": {
+    "corroborate": {
+     "pending": 25
+    },
+    "double_tap": {
+     "pending": 3,
+     "merged": 16
+    },
+    "first": {
+     "pending": 47,
+     "merged": 3
+    },
+    "flood": {
+     "held": 25
+    },
+    "followup": {
+     "pending": 37
+    },
+    "prank_convincing": {
+     "pending": 10
+    },
+    "prank_junk": {
+     "held": 16,
+     "pending": 4
+    },
+    "prank_reused": {
+     "held": 15
+    },
+    "viral": {
+     "merged": 9
+    },
+    "wrong_building": {
+     "held": 7,
+     "pending": 8
+    }
+   },
+   "bad_held_rate": 0.84,
+   "bad_filtered_rate": 0.84,
+   "convincing_prank_held_rate": 0.0,
+   "duplicate_merged_rate": 1.0,
+   "legit_wrongly_held_rate": 0.0,
+   "legit_wrongly_merged_rate": 0.0,
+   "followup_link_rate": 0.6451612903225806,
+   "mixed_sites": 0.0,
+   "per_kind_held": {
+    "prank_junk": 0.8,
+    "prank_reused": 1.0,
+    "wrong_building": 0.4666666666666667,
+    "flood": 1.0,
+    "prank_convincing": 0.0
+   }
+  }
+ },
+ {
+  "gps_sigma_m": 12.0,
+  "seeds": 5,
+  "bad_held_rate": 0.8266666666666665,
+  "bad_filtered_rate": 0.8266666666666665,
+  "convincing_prank_held_rate": 0.0,
+  "duplicate_merged_rate": 0.9822222222222223,
+  "legit_wrongly_held_rate": 0.00596078431372549,
+  "legit_wrongly_merged_rate": 0.0,
+  "followup_link_rate": 0.5940274894076737,
+  "mixed_sites": 0.0,
+  "per_kind_held": {
+   "prank_junk": 0.85,
+   "prank_reused": 1.0,
+   "wrong_building": 0.3333333333333333,
+   "flood": 1.0,
+   "prank_convincing": 0.0
+  },
+  "example": {
+   "gps_sigma_m": 12.0,
+   "n_events": 225,
+   "by_kind": {
+    "corroborate": {
+     "pending": 25
+    },
+    "double_tap": {
+     "pending": 3,
+     "merged": 16
+    },
+    "first": {
+     "pending": 47,
+     "merged": 3
+    },
+    "flood": {
+     "held": 25
+    },
+    "followup": {
+     "pending": 37
+    },
+    "prank_convincing": {
+     "pending": 10
+    },
+    "prank_junk": {
+     "held": 16,
+     "pending": 4
+    },
+    "prank_reused": {
+     "held": 15
+    },
+    "viral": {
+     "merged": 9
+    },
+    "wrong_building": {
+     "held": 7,
+     "pending": 8
+    }
+   },
+   "bad_held_rate": 0.84,
+   "bad_filtered_rate": 0.84,
+   "convincing_prank_held_rate": 0.0,
+   "duplicate_merged_rate": 1.0,
+   "legit_wrongly_held_rate": 0.0,
+   "legit_wrongly_merged_rate": 0.0,
+   "followup_link_rate": 0.532258064516129,
+   "mixed_sites": 0.0,
+   "per_kind_held": {
+    "prank_junk": 0.8,
+    "prank_reused": 1.0,
+    "wrong_building": 0.4666666666666667,
+    "flood": 1.0,
+    "prank_convincing": 0.0
+   }
+  }
+ },
+ {
+  "gps_sigma_m": 25.0,
+  "seeds": 5,
+  "bad_held_rate": 0.8240000000000001,
+  "bad_filtered_rate": 0.8240000000000001,
+  "convincing_prank_held_rate": 0.0,
+  "duplicate_merged_rate": 0.6716279519938058,
+  "legit_wrongly_held_rate": 0.05778393175451999,
+  "legit_wrongly_merged_rate": 0.0,
+  "followup_link_rate": 0.3998071712443098,
+  "mixed_sites": 0.0,
+  "per_kind_held": {
+   "prank_junk": 0.85,
+   "prank_reused": 1.0,
+   "wrong_building": 0.31999999999999995,
+   "flood": 1.0,
+   "prank_convincing": 0.0
+  },
+  "example": {
+   "gps_sigma_m": 25.0,
+   "n_events": 225,
+   "by_kind": {
+    "corroborate": {
+     "pending": 22,
+     "held": 3
+    },
+    "double_tap": {
+     "pending": 3,
+     "merged": 12,
+     "held": 4
+    },
+    "first": {
+     "pending": 47,
+     "merged": 2,
+     "held": 1
+    },
+    "flood": {
+     "held": 25
+    },
+    "followup": {
+     "pending": 34,
+     "held": 3
+    },
+    "prank_convincing": {
+     "pending": 10
+    },
+    "prank_junk": {
+     "held": 16,
+     "pending": 4
+    },
+    "prank_reused": {
+     "held": 15
+    },
+    "viral": {
+     "merged": 8,
+     "held": 1
+    },
+    "wrong_building": {
+     "held": 6,
+     "pending": 9
+    }
+   },
+   "bad_held_rate": 0.8266666666666667,
+   "bad_filtered_rate": 0.8266666666666667,
+   "convincing_prank_held_rate": 0.0,
+   "duplicate_merged_rate": 0.7857142857142857,
+   "legit_wrongly_held_rate": 0.0625,
+   "legit_wrongly_merged_rate": 0.0,
+   "followup_link_rate": 0.35714285714285715,
+   "mixed_sites": 0.0,
+   "per_kind_held": {
+    "prank_junk": 0.8,
+    "prank_reused": 1.0,
+    "wrong_building": 0.4,
+    "flood": 1.0,
+    "prank_convincing": 0.0
+   }
+  }
+ }
+]

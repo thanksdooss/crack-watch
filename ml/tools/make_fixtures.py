@@ -83,7 +83,27 @@ def main() -> None:
         card_scenes.append({"file": name, "w": 400, "h": 300, "probe": [210, 150],
                             "pxPerMm": truth.px_per_mm_at(210, 150), "H": H.ravel().tolist()})
     meta["cardScenes"] = card_scenes
+
+    # 폭 측정: 정답 마스크 + 평탄화 영상 → 중심선 위 표본들
+    from ml.measure.width import measure
+    ws = measure(flat, s.mask)
+    meta["width"] = {"n": len(ws), "samples": [[w_.x, w_.y, w_.fwhm, w_.area, w_.depth, w_.hybrid] for w_ in ws],
+                     "trueWidthPx": 0.6 * 8}
+
+    # 색 보정: 백열등 아래에서 찍힌 색 칸 → 파이썬이 구한 보정 계수와 보정 후 잔차
+    from ml.color import calibrate
+    from ml.color.card import swatches, target_srgb
+    from ml.color.simulate import CaptureConditions, capture
+    names = [s_.name for s_ in swatches()]
+    obs = capture(target_srgb(names), CaptureConditions("백열등 A", awb_strength=0.6, exposure=0.7, flare=0.02))
+    corr = calibrate.fit(obs, names)
+    meta["calibration"] = {"names": names, "observed": obs.tolist(), "gain": corr.gain.tolist(),
+                           "offset": corr.offset.tolist(), "residual": corr.residual_delta_e,
+                           "quality": corr.quality, "corrected": corr.apply_srgb(obs).tolist()}
     meta["card"] = {"w": CARD_W, "h": CARD_H, "fiducialCentersMm": [list(c) for c in FIDUCIAL_CENTERS_MM]}
+
+    from ml.measure.phash import phash
+    meta["phash"] = {"gray": meta["files"]["gray"], "w": 192, "h": 192, "hash": phash(g)}
 
     (OUT / "meta.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(meta["stats"]), "→", OUT)

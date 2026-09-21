@@ -94,22 +94,33 @@
     "guidance": {
       "$comment": "안내 전환점일 뿐 안전 판정이 아니다. 근거: 건축물 안전점검 및 정밀안전진단 세부지침(2003, 건설교통부·한국시설안전기술공단) — 응력에 의한 균열폭 0.3mm 초과 시 보수. 오차 범위 상단이 이 값에 닿으면 보수적으로 '전문가 점검 권장'.",
       "expertReviewMm": 0.3
-    }
+    },
+    "method": "hybrid",
+    "hybridSwitchPx": 4.0,
+    "profileSmoothFrac": 0.1,
+    "$methodComment": "합성 dev에서 선택(test 미사용): 폭 4px 미만은 넓이 기반(흐림에 강함), 이상은 반치폭. 반치폭은 마스크 단면 길이의 10%만큼 평활해 균열 바닥의 기공·부스러기에 끌려가지 않게 한다. docs/decisions.md"
   },
   "classic": {
-    "$comment": "고전 CV 기준선 파라미터. 합성 dev 분할에서만 조정한다(test에서 조정 금지).",
+    "$comment": "고전 CV 기준선 파라미터. 3라운드 격자 탐색(합성 dev + CrackSeg9k val, test 미사용)으로 확정. 상위 설정 간 허용 F1 차이 < 0.005로 평평해져 탐색 종료. ml/baseline/tune.py",
     "flattenSigma": 20.0,
     "scales": [
-      1.0,
-      1.5,
       2.0,
-      3.0
+      3.0,
+      4.0,
+      6.0
     ],
     "beta": 0.5,
-    "c": 0.015,
-    "hystHigh": 0.35,
-    "hystLow": 0.12,
-    "minLengthPx": 24,
-    "minElongation": 4.0
+    "c": 0.5,
+    "hystHigh": 0.3,
+    "hystLow": 0.2,
+    "minLengthPx": 32,
+    "minElongation": 8.0
+  },
+  "model": {
+    "$comment": "val에서 고름(헛경보 상한 10%). ml.train.threshold",
+    "file": "crack_unet_fp32.onnx",
+    "threshold": 0.6,
+    "minArea": 0,
+    "$fileComment": "8비트 양자화는 가는 균열 출력을 무너뜨려(원본 대비 마스크 IoU 0.08~0.33) 32비트를 배포한다. docs/results/quantization.json"
   }
 }

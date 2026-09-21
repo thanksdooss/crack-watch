@@ -67,12 +67,11 @@ def main() -> None:
 
     p = Path(ROOT) / "shared" / "pipeline.json"
     cfg = json.loads(p.read_text(encoding="utf-8"))
-    cfg["model"] = {
-        "$comment": f"val에서 고름(헛경보 상한 {FA_LIMIT:.0%}). ml.train.threshold",
-        "file": "crack_unet_int8.onnx",
+    cfg.setdefault("model", {}).update({
+        "$comment": f"임계값·최소 면적은 val에서 고름(헛경보 상한 {FA_LIMIT:.0%}). ml.train.threshold",
         "threshold": best["threshold"],
         "minArea": best["min_area"],
-    }
+    })
     p.write_text(json.dumps(cfg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 

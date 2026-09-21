@@ -1,0 +1,26 @@
+[
+  {
+    "file": "wall-daylight.jpg",
+    "title": "맑은 날 · 가는 균열",
+    "synthetic": true,
+    "lighting": "주광 D65",
+    "trueWidthMm": 0.35,
+    "truePxPerMm": 5.0
+  },
+  {
+    "file": "wall-fluorescent.jpg",
+    "title": "형광등 · 중간 균열",
+    "synthetic": true,
+    "lighting": "형광등 F2",
+    "trueWidthMm": 0.9,
+    "truePxPerMm": 4.5
+  },
+  {
+    "file": "wall-tungsten.jpg",
+    "title": "백열등 · 넓은 균열",
+    "synthetic": true,
+    "lighting": "백열등 A",
+    "trueWidthMm": 2.2,
+    "truePxPerMm": 4.0
+  }
+]

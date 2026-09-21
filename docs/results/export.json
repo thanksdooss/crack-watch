@@ -1,0 +1,8 @@
+{
+  "run": "unet-mnv3s",
+  "fp32_mb": 6.17,
+  "int8_mb": 1.9,
+  "mean_abs_prob_diff": 0.04320502872272165,
+  "mask_iou_int8_vs_fp32": 0.09117241625656154,
+  "n_checked": 80
+}

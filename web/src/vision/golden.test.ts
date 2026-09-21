@@ -72,3 +72,10 @@ describe('파이썬과 같은 답', { timeout: 60_000 }, () => {
     expect(maxAbsDiff(out, f32(meta.files.norm32))).toBeLessThan(1e-5)
   })
 })
+
+describe('지각 해시 — 파이썬과 같은 값', () => {
+  it('같은 휘도 → 같은 해시', async () => {
+    const { phash } = await import('../lib/phash')
+    expect(phash(f32(meta.phash.gray), meta.phash.w, meta.phash.h)).toBe(meta.phash.hash)
+  })
+})

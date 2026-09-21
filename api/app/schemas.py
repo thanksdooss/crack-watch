@@ -68,8 +68,58 @@ class TrustReason(BaseModel):
 
 
 class ReportOut(BaseModel):
-    id: str
+    id: int
+    site_id: int | None = None
+    duplicate_of: int | None = None
     state: Literal["pending", "accepted", "held", "merged", "rejected", "closed"]
     trust_score: Annotated[float, Field(ge=0, le=1)]
     # 보류·반려는 반드시 사유가 남는다. 사람에게 설명할 수 없으면 운영에서 못 쓴다.
     trust_reasons: list[TrustReason]
+
+
+class ObservationOut(BaseModel):
+    width_mm: float
+    width_ci_mm: tuple[float, float]
+    length_mm: float
+
+
+class HistoryPoint(BaseModel):
+    report_id: int
+    captured_at: datetime
+    state: str
+    max_width_mm: float | None
+    max_width_ci_mm: tuple[float, float] | None
+    engine: str
+
+
+class SiteOut(BaseModel):
+    id: int
+    lat: float
+    lon: float
+    status: str
+    report_count: int
+    latest_width_mm: float | None
+    trend: Literal["widening", "stable", "unknown"]
+    guidance: Literal["관찰 필요", "전문가 점검 권장", "판정 보류"]
+
+
+class SiteDetail(SiteOut):
+    history: list[HistoryPoint]
+    trend_detail: str
+
+
+class AdminAction(BaseModel):
+    action: Literal["accept", "reject", "close", "hold", "reopen"]
+    reason: Annotated[str, Field(min_length=2, max_length=500)]
+
+
+class Stats(BaseModel):
+    total: int
+    by_state: dict[str, int]
+    auto_held_rate: float
+    duplicate_rate: float
+    reviewed: int
+    false_report_rate: float | None  # 검토한 것 중 반려 비율
+    held_precision: float | None  # 자동 보류했던 것 중 사람이 반려한 비율
+    pending_leak: float | None  # 통과시켰던 것 중 사람이 반려한 비율
+    reason_counts: dict[str, int]

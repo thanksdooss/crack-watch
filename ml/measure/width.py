@@ -20,7 +20,12 @@ import numpy as np
 
 from .skeleton import thin
 
-METHODS = ("mask_dt", "fwhm", "area")
+from ml.color.card import pipeline_config
+
+METHODS = ("mask_dt", "fwhm", "area", "hybrid")
+_M = pipeline_config()["measure"]
+SWITCH_PX = float(_M["hybridSwitchPx"])
+SMOOTH_FRAC = float(_M["profileSmoothFrac"])
 
 
 @dataclass
@@ -31,6 +36,7 @@ class WidthSample:
     fwhm: float
     area: float
     depth: float  # 단면 골의 상대 깊이 (0~1)
+    hybrid: float = 0.0  # 채택한 방법: 가늘면 area, 넓으면 fwhm
 
 
 def _direction(skel: np.ndarray, p: np.ndarray, radius: int = 5) -> np.ndarray | None:
@@ -89,6 +95,29 @@ def _fwhm_and_area(t: np.ndarray, v: np.ndarray, core: float) -> tuple[float, fl
     return fwhm, darkness, depth, bg
 
 
+def chord(mask: np.ndarray, p: np.ndarray, normal: np.ndarray, max_len: int = 96) -> int:
+    """중심점에서 단면 방향으로 마스크를 가로지른 길이(px). 균열 폭의 대략값 — 평활·탐색 범위에 쓴다."""
+    h, w = mask.shape
+    total = 1
+    for sgn in (1, -1):
+        k = 0
+        while k < max_len:
+            x = int(round(float(p[0] + sgn * (k + 1) * normal[0])))
+            y = int(round(float(p[1] + sgn * (k + 1) * normal[1])))
+            if not (0 <= x < w and 0 <= y < h) or not mask[y, x]:
+                break
+            k += 1
+        total += k
+    return total
+
+
+def _smooth(v: np.ndarray, sigma_samples: float) -> np.ndarray:
+    if sigma_samples <= 0.5:
+        return v
+    return cv2.GaussianBlur(v.reshape(1, -1).astype(np.float32), (0, 0), sigmaX=sigma_samples,
+                            sigmaY=0.01).ravel()
+
+
 def measure(gray: np.ndarray, mask: np.ndarray, half_width_px: int = 12, stride: int = 3
             ) -> list[WidthSample]:
     """중심선을 따라 stride 간격으로 폭을 잰다. gray는 평탄화된 밝기(배경≈1) 권장."""
@@ -108,8 +137,20 @@ def measure(gray: np.ndarray, mask: np.ndarray, half_width_px: int = 12, stride:
         normal = np.array([-d[1], d[0]], np.float32)
         p = pts[i]
         mdt = float(2 * dist[int(p[1]), int(p[0])])
-        t, v = _profile(gray, p, normal, half_width_px)
-        fwhm, dark, depth, bg = _fwhm_and_area(t, v, core=max(mdt, 1.5))
+        L = chord(mask, p, normal)
+        core = max(1.5, 0.5 * L)
+        # 넓은 균열은 ±12px 단면 밖으로 삐져나가 폭이 잘린다. 골 가장자리가 창 끝에 닿으면
+        # 창을 두 배로 넓혀 다시 잰다.
+        # 반치폭은 균열 폭(L)의 10%만큼 평활한 단면에서 잰다 — 넓은 균열 바닥의 기공 하나가
+        # '가장 어두운 점'이 되면 그 기공 폭만 재는 문제가 있었다(docs/decisions.md).
+        # 넓이(어두워진 총량)는 평활해도 보존되므로 원본 단면에서 잰다.
+        fwhm = 0.0
+        for half in (half_width_px, half_width_px * 2, half_width_px * 4):
+            t, v = _profile(gray, p, normal, half)
+            fwhm, _, depth, bg = _fwhm_and_area(t, _smooth(v, SMOOTH_FRAC * L / (t[1] - t[0])), core)
+            _, dark, _, _ = _fwhm_and_area(t, v, core)
+            if fwhm > 0 and fwhm < 0.8 * half:
+                break
         if fwhm <= 0:
             continue
         raw.append((p, mdt, fwhm, dark, depth, bg))
@@ -124,5 +165,6 @@ def measure(gray: np.ndarray, mask: np.ndarray, half_width_px: int = 12, stride:
     out = []
     for p, mdt, fwhm, dark, depth, bg in raw:
         area_w = dark / max(true_depth * bg, 1e-6)
-        out.append(WidthSample(float(p[0]), float(p[1]), max(mdt, 0.0), fwhm, area_w, depth))
+        hyb = area_w if fwhm < SWITCH_PX else fwhm
+        out.append(WidthSample(float(p[0]), float(p[1]), max(mdt, 0.0), fwhm, area_w, depth, hyb))
     return out

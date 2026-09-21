@@ -136,3 +136,4 @@ API 테스트는 `TEST_DATABASE_URL`로 PostgreSQL에서도 돈다.
 - [verification.md](docs/verification.md) — 신고 검증 시뮬레이션과 사진 지문 임계값
 - [color-calibration.md](docs/color-calibration.md) — 조명별 보정 전후 색 오차
 - [decisions.md](docs/decisions.md) — 막힌 것과 고른 방법, 그때그때의 기록
+- [story.md](docs/story.md) — 왜 시작했나, 용어 풀이, 불편 세 가지, 면접 대비 질문

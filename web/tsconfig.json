@@ -3,7 +3,12 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ES2022", "DOM", "DOM.Iterable", "WebWorker"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable",
+      "WebWorker"
+    ],
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -11,8 +16,25 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["vite/client"],
-    "paths": { "@/*": ["./src/*"], "@shared/*": ["../shared/*"] }
+    "types": [
+      "vite/client",
+      "node"
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@shared/*": [
+        "../shared/*"
+      ]
+    }
   },
-  "include": ["src/**/*.ts", "src/**/*.vue", "../shared/pipeline.json"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "../shared/pipeline.json"
+  ],
+  "exclude": [
+    "src/**/*.test.ts"
+  ]
 }

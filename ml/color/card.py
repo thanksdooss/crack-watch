@@ -36,14 +36,15 @@ class Swatch:
     is_neutral: bool  # 보정 계수를 여기서만 구한다
 
 
-# 카드 전체 치수 (mm)
-CARD_W, CARD_H = 90.0, 56.0
-FIDUCIAL_SIZE = 7.0
-FIDUCIAL_MARGIN = 3.0
-SWATCH_MM = 12.0
-SWATCH_GAP = 2.0
-GRID_X0, GRID_Y0 = 25.0, 20.0
-RULER_X0, RULER_Y0, RULER_LEN = 15.0, 12.0, 60.0
+_CARD = pipeline_config()["calibration"]["card"]
+# 카드 전체 치수 (mm). 값의 단일 출처는 shared/pipeline.json — 웹 검출기도 같은 값을 읽는다.
+CARD_W, CARD_H = float(_CARD["w"]), float(_CARD["h"])
+FIDUCIAL_SIZE = float(_CARD["fiducialSize"])
+FIDUCIAL_MARGIN = float(_CARD["fiducialMargin"])
+SWATCH_MM = float(_CARD["swatchMm"])
+SWATCH_GAP = float(_CARD["swatchGap"])
+GRID_X0, GRID_Y0 = float(_CARD["gridX0"]), float(_CARD["gridY0"])
+RULER_X0, RULER_Y0, RULER_LEN = float(_CARD["rulerX0"]), float(_CARD["rulerY0"]), float(_CARD["rulerLen"])
 
 NEUTRALS = {"white", "gray50", "black", "gray18"}
 

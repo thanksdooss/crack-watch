@@ -8,29 +8,108 @@
     "colorSpace": "RGB"
   },
   "normalize": {
-    "mean": [0.485, 0.456, 0.406],
-    "std": [0.229, 0.224, 0.225]
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
   },
   "calibration": {
     "patch": {
       "rows": 2,
       "cols": 3,
-      "swatches": ["white", "gray50", "black", "red", "blue", "gray18"],
+      "swatches": [
+        "white",
+        "gray50",
+        "black",
+        "red",
+        "blue",
+        "gray18"
+      ],
       "targetSrgb": {
-        "white":  [243, 243, 242],
-        "gray50": [122, 122, 121],
-        "black":  [ 52,  52,  52],
-        "red":    [175,  54,  60],
-        "blue":   [ 56,  61, 150],
-        "gray18": [ 85,  85,  85]
-      },
-      "sizeMm": { "swatch": 12.0, "gap": 2.0 }
+        "white": [
+          243,
+          243,
+          242
+        ],
+        "gray50": [
+          122,
+          122,
+          121
+        ],
+        "black": [
+          52,
+          52,
+          52
+        ],
+        "red": [
+          175,
+          54,
+          60
+        ],
+        "blue": [
+          56,
+          61,
+          150
+        ],
+        "gray18": [
+          85,
+          85,
+          85
+        ]
+      }
     },
-    "deltaEThreshold": { "good": 3.0, "fair": 6.0 }
+    "deltaEThreshold": {
+      "good": 3.0,
+      "fair": 6.0
+    },
+    "card": {
+      "$comment": "기준 카드 치수(mm, 좌하단 원점, y 위로). PDF 생성기·파이썬 검출기·웹 검출기가 모두 여기서 읽는다.",
+      "w": 90.0,
+      "h": 56.0,
+      "fiducialSize": 7.0,
+      "fiducialMargin": 3.0,
+      "swatchMm": 12.0,
+      "swatchGap": 2.0,
+      "gridX0": 25.0,
+      "gridY0": 20.0,
+      "rulerX0": 15.0,
+      "rulerY0": 12.0,
+      "rulerLen": 60.0
+    }
   },
   "measure": {
     "profileHalfWidthPx": 12,
     "minCrackLengthPx": 24,
-    "minAspectRatio": 4.0
+    "minAspectRatio": 4.0,
+    "resolutionFloorPx": 0.5,
+    "minMeasurablePx": 1.5,
+    "representativePercentile": 90,
+    "maxScaleUncertainty": 0.15,
+    "guidance": {
+      "$comment": "안내 전환점일 뿐 안전 판정이 아니다. 근거: 건축물 안전점검 및 정밀안전진단 세부지침(2003, 건설교통부·한국시설안전기술공단) — 응력에 의한 균열폭 0.3mm 초과 시 보수. 오차 범위 상단이 이 값에 닿으면 보수적으로 '전문가 점검 권장'.",
+      "expertReviewMm": 0.3
+    }
+  },
+  "classic": {
+    "$comment": "고전 CV 기준선 파라미터. 합성 dev 분할에서만 조정한다(test에서 조정 금지).",
+    "flattenSigma": 20.0,
+    "scales": [
+      1.0,
+      1.5,
+      2.0,
+      3.0
+    ],
+    "beta": 0.5,
+    "c": 0.015,
+    "hystHigh": 0.35,
+    "hystLow": 0.12,
+    "minLengthPx": 24,
+    "minElongation": 4.0
   }
 }

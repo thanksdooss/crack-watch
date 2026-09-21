@@ -17,7 +17,7 @@ dependencies = [
 
 [project.optional-dependencies]
 # 3단계(모델 학습)에서 설치한다. 지금 넣으면 수 GB가 필요 없이 깔린다.
-ml = ["torch", "torchvision", "albumentations", "onnx", "onnxruntime", "onnxsim"]
+ml = ["torch>=2.5", "torchvision>=0.20", "onnx>=1.17", "onnxruntime>=1.20"]
 
 [dependency-groups]
 dev = ["pytest>=8.3", "httpx>=0.28", "ruff>=0.9"]

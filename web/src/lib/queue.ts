@@ -33,7 +33,8 @@ async function tx<T>(mode: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBReq
 export const put = (r: QueuedReport) => tx('readwrite', (s) => s.put(r))
 export const all = () => tx<QueuedReport[]>('readonly', (s) => s.getAll() as IDBRequest<QueuedReport[]>)
 
-export const API_URL: string | undefined = import.meta.env.VITE_API_URL
+import { API_URL, api } from './api'
+export { API_URL }
 
 /** 대기 중인 신고를 보낸다. 서버 주소가 없으면(데모) 기기에만 남는다. */
 export async function flush(): Promise<number> {
@@ -42,9 +43,7 @@ export async function flush(): Promise<number> {
   for (const r of await all()) {
     if (r.state === 'sent') continue
     try {
-      const res = await fetch(`${API_URL}/reports`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(r.payload) })
-      if (!res.ok) throw new Error(String(res.status))
-      await put({ ...r, state: 'sent', response: await res.json() })
+      await put({ ...r, state: 'sent', response: await api.postReport(r.payload) })
       sent++
     } catch {
       await put({ ...r, state: 'failed' })

@@ -15,10 +15,16 @@ export type AnalyzeResponse =
   | { id: number; progress: string }
 
 let modelPromise: Promise<ModelRunner | null> | null = null
+let modelError = ''
 
 async function getModel(): Promise<ModelRunner | null> {
   if (!modelPromise) {
-    modelPromise = import('../model/runner').then((m) => m.createRunner()).catch(() => null)
+    modelPromise = import('../model/runner').then((m) => m.createRunner()).catch((e: Error) => {
+      modelError = e?.message ?? String(e)
+      console.error('[model] 로드 실패', e)
+      modelPromise = null // 다음 요청에서 다시 시도
+      return null
+    })
   }
   return modelPromise
 }
@@ -34,7 +40,7 @@ self.onmessage = async (ev: MessageEvent<AnalyzeRequest>) => {
     const model = useModel ? await getModel() : null
     ;(self as unknown as Worker).postMessage({ id, progress: '분석 중' } satisfies AnalyzeResponse)
     const result = await analyze({ rgb, w, h }, { model })
-    if (useModel && !model) result.warnings.push('모델을 불러오지 못해 고전 영상처리로 분석했습니다')
+    if (useModel && !model) result.warnings.push(`모델을 불러오지 못해 고전 영상처리로 분석했습니다 (${modelError})`)
     ;(self as unknown as Worker).postMessage({ id, ok: true, result } satisfies AnalyzeResponse)
   } catch (e) {
     ;(self as unknown as Worker).postMessage({ id, ok: false, error: (e as Error).message } satisfies AnalyzeResponse)

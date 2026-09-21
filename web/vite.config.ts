@@ -1,10 +1,32 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 import { fileURLToPath, URL } from 'node:url'
+import { readFileSync, existsSync } from 'node:fs'
+import { resolve } from 'node:path'
+
+// 개발 서버는 /public 안의 .mjs를 모듈로 불러오는 걸 막는다(배포 빌드는 괜찮다).
+// ONNX Runtime Web은 실행 시점에 /ort/ort-wasm-simd-threaded.mjs를 import하므로,
+// 개발 서버에서만 이 요청을 먼저 가로채 node_modules의 파일을 그대로 내준다.
+function serveOrtInDev(): Plugin {
+  const dist = fileURLToPath(new URL('./node_modules/onnxruntime-web/dist/', import.meta.url))
+  return {
+    name: 'serve-ort-in-dev',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/ort', (req, res, next) => {
+        const file = resolve(dist, (req.url ?? '').split('?')[0].replace(/^\//, ''))
+        if (!file.startsWith(dist) || !existsSync(file)) return next()
+        res.setHeader('Content-Type', file.endsWith('.wasm') ? 'application/wasm' : 'text/javascript')
+        res.end(readFileSync(file))
+      })
+    },
+  }
+}
 
 export default defineConfig({
   plugins: [
+    serveOrtInDev(),
     vue(),
     VitePWA({
       registerType: 'autoUpdate',

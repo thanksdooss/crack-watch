@@ -1,0 +1,32 @@
+[project]
+name = "crack-watch"
+version = "0.1.0"
+description = "시민 신고 기반 건물 균열 관찰 — API와 학습·평가 스크립트"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "pydantic>=2.10",
+    "pydantic-settings>=2.7",
+    "sqlalchemy>=2.0",
+    "alembic>=1.14",
+    "numpy>=2.0",
+    "opencv-python-headless>=4.10",
+    "pillow>=11.0",
+]
+
+[project.optional-dependencies]
+# 3단계(모델 학습)에서 설치한다. 지금 넣으면 수 GB가 필요 없이 깔린다.
+ml = ["torch", "torchvision", "albumentations", "onnx", "onnxruntime", "onnxsim"]
+
+[dependency-groups]
+dev = ["pytest>=8.3", "httpx>=0.28", "ruff>=0.9"]
+
+[tool.setuptools.packages.find]
+include = ["api*", "ml*"]
+
+[tool.pytest.ini_options]
+testpaths = ["api/tests", "ml/tests"]
+
+[tool.ruff]
+line-length = 100

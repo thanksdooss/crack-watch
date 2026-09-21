@@ -1,0 +1,36 @@
+{
+  "$comment": "전처리 파라미터 단일 정의. web(TS)과 ml(Python)이 모두 이 파일을 읽는다. 하드코딩 금지.",
+  "version": 1,
+  "input": {
+    "tile": 512,
+    "overlap": 64,
+    "interpolation": "bilinear",
+    "colorSpace": "RGB"
+  },
+  "normalize": {
+    "mean": [0.485, 0.456, 0.406],
+    "std": [0.229, 0.224, 0.225]
+  },
+  "calibration": {
+    "patch": {
+      "rows": 2,
+      "cols": 3,
+      "swatches": ["white", "gray50", "black", "red", "blue", "gray18"],
+      "targetSrgb": {
+        "white":  [243, 243, 242],
+        "gray50": [122, 122, 121],
+        "black":  [ 52,  52,  52],
+        "red":    [175,  54,  60],
+        "blue":   [ 56,  61, 150],
+        "gray18": [ 85,  85,  85]
+      },
+      "sizeMm": { "swatch": 12.0, "gap": 2.0 }
+    },
+    "deltaEThreshold": { "good": 3.0, "fair": 6.0 }
+  },
+  "measure": {
+    "profileHalfWidthPx": 12,
+    "minCrackLengthPx": 24,
+    "minAspectRatio": 4.0
+  }
+}

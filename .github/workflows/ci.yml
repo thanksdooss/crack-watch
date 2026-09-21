@@ -1,0 +1,29 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv venv --python 3.11 && uv pip install -e . --group dev
+      # ml 테스트 중 일부(카드 검출·색 보정)는 데이터셋 없이 돈다. 데이터셋이 필요한 평가는 CI에서 돌리지 않는다.
+      - run: .venv/bin/python -m pytest -q
+
+  web:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: web } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: web/package-lock.json }
+      - run: npm ci
+      - run: npx vitest run
+      - run: npm run build
+      - name: 공개 금지 단어·EXIF 검사 (검사어는 저장소 밖 시크릿)
+        run: node ../scripts/privacy-check.mjs dist
+        env:
+          PRIVACY_TERMS: ${{ secrets.PRIVACY_TERMS }}
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e

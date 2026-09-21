@@ -1,0 +1,26 @@
+# Render 블루프린트 — API(FastAPI) + PostgreSQL. 웹은 Vercel.
+# 처음 배포할 때 데모용 합성 신고를 넣는다(비어 있을 때만). 실제 운영이면 preDeployCommand의 시드를 빼라.
+services:
+  - type: web
+    name: crack-watch-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -e .
+    preDeployCommand: python -m api.sim.seed_demo
+    startCommand: uvicorn api.app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: crack-watch-db
+          property: connectionString
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: CORS_ORIGINS
+        sync: false # 배포한 웹 주소 (예: https://crack-watch.vercel.app)
+
+databases:
+  - name: crack-watch-db
+    plan: free

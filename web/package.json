@@ -10,7 +10,8 @@
     "test:watch": "vitest",
     "predev": "node scripts/copy-runtime.mjs",
     "prebuild": "node scripts/copy-runtime.mjs",
-    "e2e": "playwright test"
+    "e2e": "playwright test --grep-invert @bench",
+    "bench": "playwright test --grep @bench --project desktop"
   },
   "dependencies": {
     "leaflet": "1.9",

@@ -139,6 +139,32 @@ def render() -> None:
           "가중치만 양자화해도 무너진다 — 깊이별 합성곱은 채널마다 값 범위가 크게 달라 8비트 하나에 담기 어렵다. "
           "양자화를 고려한 재학습(QAT)이 다음 단계이고, 지금은 32비트(6.2MB, 목표 10MB 이하)를 배포한다.\n")
 
+    perf_path = RESULTS / "perf-browser.json"
+    if perf_path.exists():
+        import statistics as st
+
+        perf = json.loads(perf_path.read_text(encoding="utf-8"))
+        rows = [r for r in perf["rows"] if r["throttle"] == 1 and r["run"] > 0]  # 첫 실행(로딩·JIT) 제외
+        a("## 5. 처리 시간\n")
+        a(f"브라우저: {perf['browser']} (Apple Silicon 데스크톱), 합성 샘플 3장 × {perf['runs']}회 중 첫 실행을 뺀 중앙값. "
+          "사진 긴 변 1,200px, 모델 입력 긴 변 1,024px, 웹 워커 1스레드(WASM).\n")
+        a("| 엔진 | 전체 | 카드·색 보정 | 균열 검출 | 폭 측정 |")
+        a("| --- | ---: | ---: | ---: | ---: |")
+        for eng, label in (("classic", "고전 CV"), ("model", "모델(32비트)")):
+            v = [r for r in rows if r["engine"] == eng]
+            if not v:
+                continue
+            med = lambda k: st.median(r.get(k, 0) for r in v)  # noqa: E731
+            a(f"| {label} | {med('total') / 1000:.1f} s | {med('card+color'):.0f} ms | {med('detect'):.0f} ms | {med('measure'):.0f} ms |")
+        a("")
+        a("| 기기 | 상태 |")
+        a("| --- | --- |")
+        a("| 데스크톱 브라우저 (위 표) | 실측 |")
+        a("| 중급 안드로이드 / 아이폰 | **미측정** — 실기기가 필요하다 |")
+        a("")
+        a("휴대폰 근사로 크롬의 CPU 4배 감속을 써 봤지만 감속이 웹 워커에 걸리지 않아(감속했는데 오히려 빨라짐) 버렸다. "
+          "목표였던 '중급 안드로이드에서 512px 타일 2초 이내'는 아직 확인하지 못했다. 모델 파일 크기 목표(10MB 이하)는 6.2MB로 충족.\n")
+
     a("## 평가 규칙\n")
     a("- 파라미터·모델·폭 측정 방법 선택은 합성 dev와 CrackSeg9k val에서만 한다. test는 보고용으로만 쓴다.")
     a("  (폭 측정 방법을 한때 합성 test로 비교했다가 되돌려 dev에서 다시 골랐다 — docs/decisions.md)")

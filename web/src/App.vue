@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { defineAsyncComponent, ref, shallowRef } from 'vue'
+import { warmUp } from './lib/api'
 import { loadImage, runAnalysis } from './lib/analyzer'
 import type { Analysis } from './vision/analyze'
 import HomeView from './views/HomeView.vue'
@@ -16,6 +17,9 @@ const error = ref('')
 const label = ref('')
 const result = shallowRef<Analysis | null>(null)
 const useModel = ref(true)
+
+// 지도·신고에 쓸 서버를 미리 깨워 둔다(무료 요금제라 잠들어 있으면 1분쯤 걸린다).
+warmUp()
 
 async function pick(src: File | string, name: string) {
   error.value = ''

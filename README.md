@@ -116,6 +116,9 @@ API 테스트는 `TEST_DATABASE_URL`로 PostgreSQL에서도 돈다.
   30일 뒤 만료되어 쓰지 않는다. Render 대시보드에 `DATABASE_URL`(Neon 연결 문자열)과 `CORS_ORIGINS`(웹 주소)를 넣고,
   `ADMIN_TOKEN`은 자동 생성. `SEED_DEMO=true`면 데이터베이스가 비어 있을 때만 합성 데모 신고를 채운다(운영은 `false`)
 - CI: `.github/workflows/ci.yml` — 공개 금지 단어 검사어는 저장소에 두지 않고 `PRIVACY_TERMS` 시크릿으로
+- 서버 깨우기: 무료 서버는 15분 뒤 잠든다. 앱이 열릴 때 `/health`를 미리 찔러 깨우고(`web/src/lib/api.ts`),
+  `.github/workflows/keep-warm.yml`이 평일 09~20시(KST) 14분마다 신호를 보낸다(저장소 변수 `API_URL` 필요).
+  시간대를 좁힌 이유는 Render 무료가 **계정당** 월 750 인스턴스 시간이기 때문이다 — 같은 계정의 다른 서비스와 나눠 쓴다
 
 ## 데이터셋과 라이선스
 

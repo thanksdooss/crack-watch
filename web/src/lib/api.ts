@@ -12,6 +12,16 @@ export function deviceToken(): string {
   }
 }
 
+/**
+ * 서버 깨우기. 무료 요금제 서버는 15분간 접속이 없으면 잠들고 깨는 데 1분쯤 걸린다.
+ * 앱을 열자마자 한 번 찔러 두면, 사용자가 안내를 읽는 동안 서버가 일어난다.
+ * 실패해도 무시한다 — 분석 자체는 서버 없이 기기 안에서 끝나기 때문이다.
+ */
+export function warmUp(): void {
+  if (!API_URL) return
+  fetch(`${API_URL}/health`, { mode: 'cors', cache: 'no-store' }).catch(() => {})
+}
+
 async function call<T>(path: string, init: RequestInit = {}, admin?: string): Promise<T> {
   if (!API_URL) throw new Error('서버 주소가 설정되지 않은 데모 모드입니다')
   const headers: Record<string, string> = { 'Content-Type': 'application/json', ...(init.headers as Record<string, string>) }

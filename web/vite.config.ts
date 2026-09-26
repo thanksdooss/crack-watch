@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -67,4 +68,8 @@ export default defineConfig({
     },
   },
   worker: { format: 'es' },
+  test: {
+    // 단위 테스트만 돌린다. e2e/는 Playwright가 맡는다(vitest가 끌어가면 실패한다).
+    include: ['src/**/*.test.ts'],
+  },
 })

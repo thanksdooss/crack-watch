@@ -12,20 +12,11 @@
 | 무엇 | 어디에 | 상태 |
 | --- | --- | --- |
 | 앱·서버·문서 전체 | `~/projects/crack-watch` | 커밋 10개, GitHub 연결 **아직 없음** |
-| 포트폴리오 케이스 | `~/projects/portfolio`의 `content/crack-watch` 가지 | 커밋됨, `main`에 **아직 안 합침**, 푸시 안 함 |
+| 포트폴리오 케이스 | `~/projects/portfolio`의 `main` (다른 작업자가 병합 완료) | **푸시만 남음** |
 | 배포 설정 파일 | `render.yaml`, `web/vercel.json`, `.github/workflows/ci.yml` | 준비 완료 |
 
-포트폴리오 저장소의 가지 상태(2026-09-26 기준):
-
-```
-                     ┌── 6022870  main = GitHub = 지금 공개된 사이트 (클린 팩토리 갱신 포함, 푸시 완료)
-e47cb53 ─────────────┤
-(9/21 당시 main)     └── ff08d05  content/crack-watch = 균열 감시 케이스 1개 (아직 안 올림)
-```
-
-클린 팩토리 작업은 이미 끝나 main에 합쳐지고 배포까지 됐다. 남은 건 균열 감시 케이스를 main에 합치는 것뿐이고,
-케이스가 건드리는 파일은 `crack-watch` 관련 9개(전부 새 파일)라 **충돌 없이 합쳐진다.**
-다만 `skavoca.js`에 저장 안 된 수정이 남아 있으니 그것부터 정리한다(6단계).
+포트폴리오 저장소는 **다른 작업자가 맡고 있다.** 2026-09-26 기준으로 균열 감시 케이스는 이미 `main`에 병합됐고
+(충돌 없음), SKAVOCA 케이스 갱신 2건과 함께 **푸시만 남아 있다.** 이 저장소(crack-watch) 쪽에서는 포트폴리오 파일을 직접 고치지 않는다.
 
 공개해도 되는지 미리 확인한 것: 올라갈 파일은 170개(8.9MB)이고, `PROMPT.md`·검사어 목록(`.privacy-terms`)·데이터셋·학습 데이터는 **빠져 있다**.
 샘플 사진은 전부 합성 이미지라 실제 건물이 찍힌 사진은 한 장도 없다.
@@ -161,7 +152,9 @@ Render 대시보드에서 `crack-watch-api` → **Environment** → `ADMIN_TOKEN
 - `README.md`의 "데모" 항목
 - 포트폴리오 케이스의 `links` (지금은 비어 있음)와 note의 "데모와 저장소 링크는 배포 후 추가합니다." 문장
 
-직접 하고 싶으면 `~/projects/portfolio`(가지: `content/crack-watch`)의 `src/data/projects/crack-watch.js`에서 `links: []` 를 아래처럼 바꾸면 된다.
+포트폴리오 저장소는 다른 작업자가 맡고 있으므로, 나는 **바꿀 내용만 아래처럼 만들어 전달**한다.
+직접 넣으려면 `~/projects/portfolio/src/data/projects/crack-watch.js`의 `links: []` 를 이렇게 바꾸고,
+`note`의 마지막 줄("데모와 저장소 링크는 배포 후 추가합니다.")을 지우면 된다.
 
 ```js
 links: [
@@ -172,56 +165,44 @@ links: [
 
 ---
 
-## 6. 포트폴리오에 케이스 올리기 (10분)
+## 6. 포트폴리오에 케이스 올리기 (5분)
 
-케이스는 `~/projects/portfolio`의 `content/crack-watch` 가지에 커밋되어 있다(파일 9개, 전부 새 파일).
-**푸시하는 순간 공개 사이트에 뜬다.** 합치는 것 자체는 지금 해도 된다 — 클린 팩토리 작업은 이미 main에 들어가 있다.
+**병합은 이미 끝났다**(다른 작업자가 처리). `~/projects/portfolio`의 `main`이 GitHub보다 커밋 4개 앞서 있다.
 
-### 6-1. 저장 안 된 수정부터 정리
+| 커밋 | 내용 |
+| --- | --- |
+| `5566891` | SKAVOCA 케이스 Spring Boot 버전 정정 |
+| `f6e0f3a` | 균열 감시 케이스 병합 |
+| `56bb476` | SKAVOCA 케이스 지표를 측정값으로 교체 |
+| `ff08d05` | 균열 감시 케이스 추가 |
 
-```bash
-cd ~/projects/portfolio && git status --short
-```
-
-지금은 `skavoca.js`가 수정 상태다. 먼저 커밋하거나 되돌린 뒤 다음으로 넘어간다.
-
-### 6-2. main에 합치고 눈으로 확인
-
-```bash
-cd ~/projects/portfolio && git merge content/crack-watch
-```
-
-충돌 없이 합쳐진다(겹치는 파일이 없다). 그다음 미리보기로 케이스를 읽어 본다.
+### 6-1. 올리기 전 확인
 
 ```bash
 cd ~/projects/portfolio && npm run dev
 ```
 
-`http://localhost:5173/portfolio/#/p/crack-watch` 를 열어 세 가지를 봐 달라:
+`http://localhost:5173/portfolio/#/p/crack-watch` 에서 세 가지를 봐 달라:
 
 - 경력·역할 표현이 사실과 맞는지 (기획 3인 팀의 **팀원**, 구현은 단독)
 - 수상 표기가 없는지 (이 대회는 본인 이름 상장이 없어 일부러 뺐다)
 - 문장 톤이 본인 것 같은지
 
-고칠 부분이 있으면 알려 주면 내가 고친다. 마음에 안 들어 **통째로 되돌리려면** 푸시 전에:
-
-```bash
-cd ~/projects/portfolio && git reset --hard origin/main
-```
-
-### 6-3. 올리기
-
-```bash
-cd ~/projects/portfolio && npm run build && npm run check:privacy dist
-```
-
-`0건`이 나오면:
+### 6-2. 올리기 — 이걸 하면 공개 사이트에 뜬다
 
 ```bash
 cd ~/projects/portfolio && git push
 ```
 
-푸시 뒤 `content/crack-watch` 가지는 역할이 끝나므로 `git branch -d content/crack-watch`로 지워도 된다.
+### 6-3. 되돌리기 (푸시 전에만)
+
+균열 감시 케이스만 빼고 SKAVOCA 작업은 남기려면:
+
+```bash
+cd ~/projects/portfolio && git reset --hard 5566891
+```
+
+`git reset --hard origin/main`은 쓰지 않는다 — 다른 작업자의 SKAVOCA 갱신까지 함께 사라진다.
 
 ## 7. 직접 재야 채워지는 숫자 (선택, 40분)
 
@@ -267,7 +248,7 @@ cd ~/projects/portfolio && git push
 
 | 내가 할 수 있음 | 직접 하셔야 함 |
 | --- | --- |
-| 링크를 README·포트폴리오 케이스에 넣기 | GitHub·Vercel·Render **계정 로그인과 생성** |
+| 이 저장소 README에 링크 넣기 · 케이스 수정안 만들기 | GitHub·Vercel·Render **계정 로그인과 생성** |
 | 사진을 주면 색 오차 표 채우기 | 배포 버튼 누르기(공개 행위라 본인 확인이 필요) |
 | 문구·내용 수정, 기능 추가 | 카드 인쇄와 벽 촬영, 자로 재기 |
 | 오류 메시지를 주면 원인 찾기 | 휴대폰에서 처리 시간 확인 |

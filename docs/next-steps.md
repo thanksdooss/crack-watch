@@ -119,45 +119,57 @@ Deployments 탭에서 **Redeploy**.
 
 ---
 
-## 3. 서버 배포 — Render (20분, 무료)
+## 3. 데이터베이스와 서버 배포 (30분, 무료)
 
-신고를 받아 저장하고, 지도·관리자 화면에 쓸 서버다.
+신고를 저장할 **데이터베이스(Neon)** 를 먼저 만들고, 그다음 **서버(Render)** 를 올린다.
 
-### 3-1. 계정 연결
+> Render에도 무료 PostgreSQL이 있지만 **만든 지 30일이면 만료**된다. 포트폴리오 데모가 한 달 뒤 조용히 죽기 때문에
+> 만료가 없는 **Neon** 무료 PostgreSQL을 쓴다. SKAVOCA도 같은 이유로 Neon을 쓰고 있다.
+
+### 3-1. Neon에서 데이터베이스 만들기 (10분)
+
+1. <https://neon.com> → **Sign up** → GitHub 계정으로 로그인
+2. 프로젝트 만들기 화면에서:
+   - Project name: `crack-watch`
+   - Postgres version: 기본값 그대로
+   - Region: **Asia Pacific (Singapore)** 처럼 가까운 곳 (Render도 싱가포르로 맞춘다)
+3. **Create** → 잠시 뒤 **Connection string**(연결 문자열)이 화면에 나온다
+4. `postgresql://` 로 시작하는 그 문자열을 **통째로 복사**해 둔다
+   - 예: `postgresql://user:비밀번호@ep-xxxx.ap-southeast-1.aws.neon.tech/neondb?sslmode=require`
+   - **비밀번호가 들어 있으니 남에게 보여 주지 않는다.** 저장소에도 넣지 않는다(Render에만 입력한다)
+   - 화면을 닫아 버렸으면: 프로젝트 → **Connect**(또는 Dashboard의 Connection Details)에서 다시 볼 수 있다
+
+### 3-2. Render에 서버 올리기 (20분)
 
 1. <https://render.com> → **Get Started**(또는 Sign In) → **GitHub**로 로그인 → **Authorize Render**
-
-### 3-2. 청사진(Blueprint)으로 한 번에 만들기
-
-저장소에 있는 `render.yaml`에 설정이 들어 있어서, 버튼 몇 개로 끝난다.
-
-1. 대시보드 오른쪽 위 **New +** → **Blueprint**
-2. 저장소 목록에서 `crack-watch` → **Connect**
+2. 대시보드 오른쪽 위 **New +** → **Blueprint**
+3. 저장소 목록에서 `crack-watch` → **Connect**
    - 목록에 없으면 **Configure account**(또는 Install Render) → 저장소 접근 허용
-3. Render가 `render.yaml`을 읽어 **crack-watch-api** 서비스 하나를 보여 준다
-4. 이름(Blueprint Name)은 아무거나 — 예: `crack-watch`
-5. **CORS_ORIGINS** 값을 입력하라고 나온다 → **2-3에서 적어 둔 Vercel 주소**를 붙여넣는다
-   - 예: `https://crack-watch-abc123.vercel.app`
-   - **끝에 `/`를 붙이지 않는다.** 붙이면 브라우저가 서버 접속을 막는다
-6. **Apply**(또는 Create Resources) 클릭 → 첫 빌드는 5~10분 걸린다(파이썬 라이브러리 설치)
+4. Render가 `render.yaml`을 읽어 **crack-watch-api** 서비스 하나를 보여 준다. Blueprint Name은 아무거나(예: `crack-watch`)
+5. 값을 물어보는 칸 두 개를 채운다:
+
+| 칸 | 넣을 값 |
+| --- | --- |
+| `DATABASE_URL` | 3-1에서 복사한 Neon 연결 문자열 (그대로 붙여넣기) |
+| `CORS_ORIGINS` | 2-3에서 적어 둔 Vercel 주소 (예: `https://crack-watch-abc123.vercel.app`, **끝에 `/` 없이**) |
+
+6. **Apply**(또는 Create Resources) → 첫 빌드 5~10분(파이썬 라이브러리 설치)
 
 ### 3-3. 주소와 관리자 열쇠 확인
 
-1. 빌드가 끝나면 서비스 페이지 위쪽에 주소가 있다(예: `https://crack-watch-api-xxxx.onrender.com`) → **적어 둔다**
-2. 같은 페이지 왼쪽 **Environment** 탭 → `ADMIN_TOKEN` 줄의 눈 모양 아이콘 → 값이 보인다 → **복사해 안전한 곳에 둔다**
-   (관리자 화면에 들어갈 때 쓰는 열쇠다. 남에게 주지 않는다)
-3. 브라우저에서 `https://<서버주소>/health` 를 연다 → `{"status":"ok"}` 가 나오면 성공
+1. 빌드가 끝나면 서비스 페이지 위쪽 주소를 **적어 둔다**(예: `https://crack-watch-api-xxxx.onrender.com`)
+2. 왼쪽 **Environment** 탭 → `ADMIN_TOKEN` 줄의 눈 모양 아이콘 → 값을 **복사해 안전한 곳에** 둔다
+   (관리자 화면 열쇠다. 남에게 주지 않는다)
+3. 브라우저에서 `https://<서버주소>/health` → `{"status":"ok"}` 가 나오면 성공
+4. `https://<서버주소>/sites` 를 열면 데모 지점 목록(JSON)이 보인다 — 서버가 처음 켜질 때 합성 신고 226건을 자동으로 넣는다
 
 ### 3-4. 무료 요금제에서 알아 둘 것
 
-- **15분 동안 아무도 안 쓰면 서버가 잠든다.** 다음 접속 때 깨어나는 데 1분쯤 걸린다(면접 전에 미리 한 번 열어 두면 좋다).
-- **데이터베이스를 따로 두지 않았다.** Render의 무료 데이터베이스는 만든 지 30일이면 만료돼 데모가 조용히 죽기 때문이다.
-  대신 서버가 켜질 때마다 **합성 데모 신고 226건을 스스로 만든다.** 그래서 데모는 언제 열어도 동작한다.
-- 대신 **방문자가 넣은 신고는 서버가 재시작하면 사라진다.** 데모라서 괜찮다.
-- 나중에 진짜로 운영하려면: Render에서 PostgreSQL을 만들고 `DATABASE_URL` 환경 변수에 주소를 넣은 뒤 `SEED_DEMO`를 `false`로
-  바꾸면 된다. 코드는 그대로 둬도 된다.
-
----
+- **15분 동안 접속이 없으면 서버가 잠든다.** 다음 접속 때 깨어나는 데 1분쯤 걸린다(면접 전에 미리 열어 두면 좋다).
+- 데이터는 Neon에 남으므로 **서버가 잠들거나 재배포돼도 신고가 사라지지 않는다.**
+- 데모 데이터는 **비어 있을 때 한 번만** 들어간다. 재시작해도 중복으로 쌓이지 않는다(확인함).
+- 실제 운영으로 전환하려면 Render의 `SEED_DEMO`를 `false`로 바꾸고, Neon에서 데모 데이터를 지우면 된다.
+- Neon 무료는 만료가 없지만, 오래 접속이 없으면 데이터베이스도 잠깐 잠든다(첫 요청이 몇 초 느려진다).
 
 ## 4. 웹과 서버 연결 (5분)
 
@@ -289,9 +301,11 @@ cd ~/projects/portfolio && git reset --hard 5566891
 | GitHub의 자동 검사가 빨간 X | `PRIVACY_TERMS` 비밀값이 없을 때 그렇다(1-4단계). 코드 문제가 아니다 |
 | 첫 분석이 오래 걸린다 | 처음 한 번은 모델 파일(6.2MB)을 받는다. 두 번째부터는 빠르다 |
 | 지도는 되는데 신고가 안 들어간다 | `CORS_ORIGINS`(Render)에 적은 웹 주소가 실제 주소와 다르거나 끝에 `/`가 붙었다 |
+| Render 로그에 `psycopg2` 오류 | `DATABASE_URL`을 Neon에서 복사한 그대로 넣었는지 확인(형식 변환은 코드가 알아서 한다) |
+| Render 로그에 `could not connect` | Neon 연결 문자열이 잘렸거나 `?sslmode=require`가 빠졌다. Neon에서 다시 복사 |
 | Vercel 빌드 실패 "No such file" | Root Directory가 `web`이 아니다. Settings → General에서 고치고 Redeploy |
 | Render 배포가 빨간색 | 서비스 → Logs에서 마지막 줄을 복사해 알려 달라 |
-| 며칠 뒤 지도가 비었다 | 서버가 재시작되며 데모 데이터가 다시 만들어진다. 1분 뒤 새로고침 |
+| 며칠 뒤 지도가 비었다 | 서버가 잠들어 있다. 1분 뒤 새로고침. 데이터는 Neon에 남아 있다 |
 
 ---
 

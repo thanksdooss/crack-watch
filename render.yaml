@@ -1,24 +1,26 @@
-# Render 블루프린트 — API(FastAPI). 웹은 Vercel.
+# Render 블루프린트 — API(FastAPI). 웹은 Vercel, 데이터베이스는 Neon.
 #
-# 무료 요금제 기준으로 맞춰 둔 구성이다.
-#  - 데이터베이스를 두지 않고 서버 안의 SQLite 파일을 쓴다.
-#    Render 무료 PostgreSQL은 만든 지 30일이면 만료되어, 포트폴리오 데모가 한 달 뒤 죽는다.
-#    무료 서버의 파일은 재시작하면 초기화되지만, 아래 SEED_DEMO가 시작할 때마다 합성 신고를 다시 넣으므로
-#    데모는 언제든 동작한다(방문자가 넣은 신고는 재시작 시 사라진다 — 데모라서 괜찮다).
-#  - 실제 운영으로 쓰려면: Render에서 PostgreSQL을 만들고 DATABASE_URL 환경 변수에 그 주소를 넣고,
-#    SEED_DEMO를 false로 바꾼다. 코드는 그대로 둬도 된다.
-#  - 무료 서버는 15분간 접속이 없으면 잠들고, 다음 접속 때 깨어나는 데 1분쯤 걸린다.
+# 데이터베이스를 Render에 두지 않는 이유: Render 무료 PostgreSQL은 만든 지 30일이면 만료된다.
+# 포트폴리오 데모가 한 달 뒤 조용히 죽으므로, 만료가 없는 Neon 무료 PostgreSQL을 쓴다(SKAVOCA와 같은 방식).
+# DATABASE_URL은 저장소에 두지 않고 Render 대시보드에서 직접 넣는다(sync: false).
+#
+# 무료 요금제 특성: 15분간 접속이 없으면 서버가 잠들고, 다음 접속 때 깨어나는 데 1분쯤 걸린다.
+# SEED_DEMO=true면 서버가 켜질 때 데이터베이스가 비어 있는 경우에만 합성 데모 신고를 채운다(있으면 건너뛴다).
+# 실제 운영으로 쓸 때는 SEED_DEMO를 false로 바꾼다.
 services:
   - type: web
     name: crack-watch-api
     runtime: python
     plan: free
+    region: singapore
     buildCommand: pip install -e .
     startCommand: uvicorn api.app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
+      - key: DATABASE_URL
+        sync: false # Neon 대시보드의 연결 문자열 (postgresql://...?sslmode=require)
       - key: SEED_DEMO
         value: "true"
       - key: ADMIN_TOKEN

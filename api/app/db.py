@@ -10,9 +10,19 @@ from collections.abc import Iterator
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./data/crack_watch.db")
-if DATABASE_URL.startswith("postgres://"):  # Render 등이 주는 옛 형식
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+def normalize_db_url(url: str) -> str:
+    """접속 주소를 psycopg(3) 드라이버로 맞춘다.
+
+    Neon·Supabase는 `postgresql://...`, Render·Heroku 옛 형식은 `postgres://...`로 준다.
+    그냥 두면 SQLAlchemy가 psycopg2를 찾다가 실패한다(이 프로젝트는 psycopg3만 설치한다).
+    """
+    for prefix in ("postgresql://", "postgres://"):
+        if url.startswith(prefix):
+            return "postgresql+psycopg://" + url[len(prefix):]
+    return url
+
+
+DATABASE_URL = normalize_db_url(os.environ.get("DATABASE_URL", "sqlite:///./data/crack_watch.db"))
 
 engine = create_engine(
     DATABASE_URL,

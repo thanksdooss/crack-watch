@@ -112,7 +112,9 @@ API 테스트는 `TEST_DATABASE_URL`로 PostgreSQL에서도 돈다.
 ## 배포
 
 - 웹 → Vercel: 루트 디렉터리 `web`, 환경 변수 `VITE_API_URL`=API 주소 (`web/vercel.json`)
-- API → Render: `render.yaml` 블루프린트(PostgreSQL 포함). `CORS_ORIGINS`에 웹 주소, `ADMIN_TOKEN`은 자동 생성
+- API → Render: `render.yaml` 블루프린트. 무료 요금제 기준으로 데이터베이스 없이(SQLite) 돌고, `SEED_DEMO=true`면
+  서버가 켜질 때 합성 데모 신고를 채운다(Render 무료 PostgreSQL은 30일 뒤 만료되어 쓰지 않았다).
+  `CORS_ORIGINS`에 웹 주소, `ADMIN_TOKEN`은 자동 생성. 실제 운영은 `DATABASE_URL`에 PostgreSQL을 주고 `SEED_DEMO=false`
 - CI: `.github/workflows/ci.yml` — 공개 금지 단어 검사어는 저장소에 두지 않고 `PRIVACY_TERMS` 시크릿으로
 
 ## 데이터셋과 라이선스

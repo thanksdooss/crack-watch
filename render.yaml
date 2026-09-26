@@ -1,26 +1,27 @@
-# Render 블루프린트 — API(FastAPI) + PostgreSQL. 웹은 Vercel.
-# 처음 배포할 때 데모용 합성 신고를 넣는다(비어 있을 때만). 실제 운영이면 preDeployCommand의 시드를 빼라.
+# Render 블루프린트 — API(FastAPI). 웹은 Vercel.
+#
+# 무료 요금제 기준으로 맞춰 둔 구성이다.
+#  - 데이터베이스를 두지 않고 서버 안의 SQLite 파일을 쓴다.
+#    Render 무료 PostgreSQL은 만든 지 30일이면 만료되어, 포트폴리오 데모가 한 달 뒤 죽는다.
+#    무료 서버의 파일은 재시작하면 초기화되지만, 아래 SEED_DEMO가 시작할 때마다 합성 신고를 다시 넣으므로
+#    데모는 언제든 동작한다(방문자가 넣은 신고는 재시작 시 사라진다 — 데모라서 괜찮다).
+#  - 실제 운영으로 쓰려면: Render에서 PostgreSQL을 만들고 DATABASE_URL 환경 변수에 그 주소를 넣고,
+#    SEED_DEMO를 false로 바꾼다. 코드는 그대로 둬도 된다.
+#  - 무료 서버는 15분간 접속이 없으면 잠들고, 다음 접속 때 깨어나는 데 1분쯤 걸린다.
 services:
   - type: web
     name: crack-watch-api
     runtime: python
     plan: free
     buildCommand: pip install -e .
-    preDeployCommand: python -m api.sim.seed_demo
     startCommand: uvicorn api.app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
-      - key: DATABASE_URL
-        fromDatabase:
-          name: crack-watch-db
-          property: connectionString
+      - key: SEED_DEMO
+        value: "true"
       - key: ADMIN_TOKEN
         generateValue: true
       - key: CORS_ORIGINS
         sync: false # 배포한 웹 주소 (예: https://crack-watch.vercel.app)
-
-databases:
-  - name: crack-watch-db
-    plan: free

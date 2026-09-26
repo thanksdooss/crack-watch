@@ -76,74 +76,121 @@ cat ~/projects/crack-watch/.privacy-terms
 
 ## 2. 웹 배포 — Vercel (15분, 무료)
 
-### 2-1. 프로젝트 연결
+브라우저에서 보이는 앱을 올린다. GitHub에 올린 코드를 Vercel이 가져가 자동으로 빌드한다.
 
-1. <https://vercel.com> 로그인 (GitHub 계정으로 로그인하면 편하다)
-2. **Add New… → Project**
-3. 방금 만든 `crack-watch` 저장소 옆 **Import**
-4. 설정 화면에서 **Root Directory**를 `web`으로 바꾼다 ← **이것만 꼭 확인**
-   (Edit 버튼을 눌러 `web` 폴더 선택)
-5. Framework Preset은 Vite로 자동 인식된다. 나머지는 그대로 두고 **Deploy**
+### 2-1. 계정 연결
 
-2~3분 뒤 배포가 끝나고 `https://crack-watch-xxxx.vercel.app` 같은 주소가 나온다.
+1. <https://vercel.com> 접속 → **Sign Up**(또는 Log In) → **Continue with GitHub** 선택
+2. GitHub가 권한을 물으면 **Authorize Vercel** 클릭
+3. 개인 용도이므로 Hobby(무료) 플랜을 고르고, 이름은 아무거나 적어도 된다
 
-### 2-2. 잘 되는지 확인
+### 2-2. 프로젝트 가져오기
 
-그 주소를 열어서:
+1. 화면 오른쪽 위 **Add New…** → **Project**
+2. `crack-watch` 저장소 줄의 **Import** 클릭
+   - 목록에 없으면: **Adjust GitHub App Permissions** → 저장소 접근 허용 → 돌아와서 새로고침
+3. **Configure Project** 화면이 뜬다. 여기서 **딱 하나만** 바꾼다:
 
-- [ ] 첫 화면에 "균열 감시"와 샘플 3장이 보인다
-- [ ] 샘플 하나를 누르면 몇 초 뒤 결과가 나오고, 균열이 주황색으로 표시된다
-- [ ] 결과에 "전문가 진단이 아닙니다" 안내가 보인다
-- [ ] 기준 카드(PDF) 링크가 열린다
+| 항목 | 값 | 설명 |
+| --- | --- | --- |
+| Framework Preset | Vite | 자동으로 잡힌다. 그대로 |
+| **Root Directory** | **`web`** | ← **이것만 바꾼다.** Edit 버튼 → 목록에서 `web` 폴더 선택 → Continue |
+| Build Command | `npm run build` | 그대로 |
+| Output Directory | `dist` | 그대로 |
+| Environment Variables | 비워 둠 | 4단계에서 넣는다 |
 
-이 단계에서는 **서버가 아직 없어서** 지도와 관리자 화면은 비어 있다. 정상이다.
+4. **Deploy** 클릭 → 1~3분 기다린다
+
+### 2-3. 주소 확인
+
+배포가 끝나면 축하 화면과 함께 주소가 나온다(예: `https://crack-watch-abc123.vercel.app`).
+이 주소를 **적어 둔다** — 3단계에서 쓴다.
+
+열어서 확인:
+
+- [ ] "균열 감시" 제목과 샘플 3장이 보인다
+- [ ] 샘플을 누르면 몇 초 뒤 결과가 나온다(처음 한 번은 모델 6.2MB를 받느라 느리다)
+- [ ] 결과에 "전문가 진단이 아닙니다" 안내가 있다
+
+> 이 단계에서 지도·관리자 화면이 비어 있는 건 **정상**이다. 서버가 아직 없다.
+
+**Root Directory를 잘못 지정해 빌드가 실패했다면**: 프로젝트 → Settings → General → Root Directory를 `web`으로 고치고
+Deployments 탭에서 **Redeploy**.
 
 ---
 
 ## 3. 서버 배포 — Render (20분, 무료)
 
-신고를 저장하고 지도·관리자 화면에 쓸 서버다.
+신고를 받아 저장하고, 지도·관리자 화면에 쓸 서버다.
 
-1. <https://render.com> 로그인 (GitHub 계정 권장)
-2. **New → Blueprint**
-3. `crack-watch` 저장소 선택 → Render가 `render.yaml`을 읽어 **서버 1개 + 데이터베이스 1개**를 자동으로 잡아 준다
-4. `CORS_ORIGINS` 값을 물어보면, **2단계에서 받은 Vercel 주소**를 그대로 넣는다
-   (예: `https://crack-watch-xxxx.vercel.app` — 끝에 `/` 붙이지 않는다)
-5. Apply / Create
+### 3-1. 계정 연결
 
-첫 배포는 5~10분 걸린다. 끝나면 `https://crack-watch-api-xxxx.onrender.com` 같은 주소가 나온다.
+1. <https://render.com> → **Get Started**(또는 Sign In) → **GitHub**로 로그인 → **Authorize Render**
 
-### 3-1. 관리자 비밀번호 확인해 두기
+### 3-2. 청사진(Blueprint)으로 한 번에 만들기
 
-Render 대시보드에서 `crack-watch-api` → **Environment** → `ADMIN_TOKEN` 값을 눈 모양 아이콘으로 확인해 복사해 둔다. 관리자 화면에 들어갈 때 쓴다. (남에게 알려주지 않는다)
+저장소에 있는 `render.yaml`에 설정이 들어 있어서, 버튼 몇 개로 끝난다.
 
-### 3-2. 서버가 살아 있는지 확인
+1. 대시보드 오른쪽 위 **New +** → **Blueprint**
+2. 저장소 목록에서 `crack-watch` → **Connect**
+   - 목록에 없으면 **Configure account**(또는 Install Render) → 저장소 접근 허용
+3. Render가 `render.yaml`을 읽어 **crack-watch-api** 서비스 하나를 보여 준다
+4. 이름(Blueprint Name)은 아무거나 — 예: `crack-watch`
+5. **CORS_ORIGINS** 값을 입력하라고 나온다 → **2-3에서 적어 둔 Vercel 주소**를 붙여넣는다
+   - 예: `https://crack-watch-abc123.vercel.app`
+   - **끝에 `/`를 붙이지 않는다.** 붙이면 브라우저가 서버 접속을 막는다
+6. **Apply**(또는 Create Resources) 클릭 → 첫 빌드는 5~10분 걸린다(파이썬 라이브러리 설치)
 
-브라우저에서 `https://<서버주소>/health` 를 연다. `{"status":"ok"}` 가 나오면 성공이다.
+### 3-3. 주소와 관리자 열쇠 확인
 
-> **무료 요금제 주의**: 15분 동안 아무도 안 쓰면 서버가 잠든다. 다음 접속 때 깨어나느라 30~60초 걸린다. 면접 전에 미리 한 번 열어 두면 좋다.
+1. 빌드가 끝나면 서비스 페이지 위쪽에 주소가 있다(예: `https://crack-watch-api-xxxx.onrender.com`) → **적어 둔다**
+2. 같은 페이지 왼쪽 **Environment** 탭 → `ADMIN_TOKEN` 줄의 눈 모양 아이콘 → 값이 보인다 → **복사해 안전한 곳에 둔다**
+   (관리자 화면에 들어갈 때 쓰는 열쇠다. 남에게 주지 않는다)
+3. 브라우저에서 `https://<서버주소>/health` 를 연다 → `{"status":"ok"}` 가 나오면 성공
 
----
+### 3-4. 무료 요금제에서 알아 둘 것
 
-## 4. 웹과 서버 연결하기 (5분)
-
-1. Vercel 대시보드 → `crack-watch` 프로젝트 → **Settings → Environment Variables**
-2. Name: `VITE_API_URL` / Value: 3단계의 서버 주소(`https://...onrender.com`, 끝에 `/` 없이)
-3. Save
-4. **Deployments** 탭 → 맨 위 배포의 **⋯ → Redeploy** (환경 변수는 다시 배포해야 반영된다)
-
-### 확인 체크리스트
-
-웹 주소를 다시 열어서:
-
-- [ ] 위쪽 **지도·이력** 탭에 빨간 점들이 보인다 (데모용 합성 신고 226건이 자동으로 들어 있다)
-- [ ] 점 하나를 누르면 아래에 폭 변화 그래프가 나온다
-- [ ] **관리자** 탭 → 3-1에서 복사한 토큰 입력 → **불러오기** → 보류된 신고 목록과 "걸러 낸 비율"이 보인다
-- [ ] 샘플 분석 후 **신고하기** → 위치 동의 → 신고가 접수된다
-
-> 지도에 있는 신고는 **합성 데모 데이터**다(메모에 `[합성 데모]`라고 적혀 있다). 실제 신고가 아니다.
+- **15분 동안 아무도 안 쓰면 서버가 잠든다.** 다음 접속 때 깨어나는 데 1분쯤 걸린다(면접 전에 미리 한 번 열어 두면 좋다).
+- **데이터베이스를 따로 두지 않았다.** Render의 무료 데이터베이스는 만든 지 30일이면 만료돼 데모가 조용히 죽기 때문이다.
+  대신 서버가 켜질 때마다 **합성 데모 신고 226건을 스스로 만든다.** 그래서 데모는 언제 열어도 동작한다.
+- 대신 **방문자가 넣은 신고는 서버가 재시작하면 사라진다.** 데모라서 괜찮다.
+- 나중에 진짜로 운영하려면: Render에서 PostgreSQL을 만들고 `DATABASE_URL` 환경 변수에 주소를 넣은 뒤 `SEED_DEMO`를 `false`로
+  바꾸면 된다. 코드는 그대로 둬도 된다.
 
 ---
+
+## 4. 웹과 서버 연결 (5분)
+
+웹은 아직 서버 주소를 모른다. 알려 주고 다시 배포하면 지도·관리자 화면이 살아난다.
+
+1. Vercel 대시보드 → `crack-watch` 프로젝트 → 위쪽 **Settings** 탭
+2. 왼쪽 메뉴 **Environment Variables**
+3. 입력:
+
+| 칸 | 넣을 값 |
+| --- | --- |
+| Key | `VITE_API_URL` |
+| Value | 3-3에서 적어 둔 Render 주소 (예: `https://crack-watch-api-xxxx.onrender.com`, **끝에 `/` 없이**) |
+| Environments | 전부 체크(Production·Preview·Development) |
+
+4. **Save**
+5. 위쪽 **Deployments** 탭 → 맨 위 배포 오른쪽 **⋯** → **Redeploy**
+   - "Use existing Build Cache" 체크는 **해제**하는 편이 확실하다
+   - 다시 1~3분
+
+> 환경 변수는 **빌드할 때** 앱에 박히기 때문에, 저장만 하고 다시 배포하지 않으면 반영되지 않는다.
+
+### 4-1. 최종 확인 (5분)
+
+웹 주소를 새로 열어서:
+
+- [ ] **분석**: 샘플 → 결과가 나오고 균열이 주황색으로 표시된다
+- [ ] **지도·이력**: 빨간 점들이 보인다(서버가 잠들어 있으면 1분 뒤 새로고침)
+- [ ] 점을 누르면 아래에 폭 변화 그래프가 나온다
+- [ ] **관리자**: 3-3에서 복사한 토큰 입력 → 불러오기 → 보류된 신고와 "걸러 낸 비율"이 보인다
+- [ ] 샘플 분석 → **신고하기** → 위치 동의 → 접수된다
+
+다 되면 주소 두 개(웹·서버)와 GitHub 주소를 알려 달라. README와 포트폴리오 케이스에 넣을 링크를 정리해 주겠다.
 
 ## 5. 링크를 문서와 포트폴리오에 넣기 (내가 대신 할 수 있음)
 
@@ -241,6 +288,10 @@ cd ~/projects/portfolio && git reset --hard 5566891
 | 신고가 "데모 모드"로만 저장된다 | 웹이 서버 주소를 모른다. Vercel 환경 변수 확인 후 재배포 |
 | GitHub의 자동 검사가 빨간 X | `PRIVACY_TERMS` 비밀값이 없을 때 그렇다(1-4단계). 코드 문제가 아니다 |
 | 첫 분석이 오래 걸린다 | 처음 한 번은 모델 파일(6.2MB)을 받는다. 두 번째부터는 빠르다 |
+| 지도는 되는데 신고가 안 들어간다 | `CORS_ORIGINS`(Render)에 적은 웹 주소가 실제 주소와 다르거나 끝에 `/`가 붙었다 |
+| Vercel 빌드 실패 "No such file" | Root Directory가 `web`이 아니다. Settings → General에서 고치고 Redeploy |
+| Render 배포가 빨간색 | 서비스 → Logs에서 마지막 줄을 복사해 알려 달라 |
+| 며칠 뒤 지도가 비었다 | 서버가 재시작되며 데모 데이터가 다시 만들어진다. 1분 뒤 새로고침 |
 
 ---
 

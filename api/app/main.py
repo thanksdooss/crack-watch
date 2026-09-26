@@ -11,6 +11,15 @@ from .routers import admin, reports, sites
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     init_db()
+    # 데모 배포용: 비어 있으면 합성 신고를 넣어 지도·관리자 화면을 체험할 수 있게 한다.
+    # Render 무료 요금제는 배포 전 명령(preDeployCommand)을 쓸 수 없어 여기서 한다.
+    if os.environ.get("SEED_DEMO", "").lower() in ("1", "true", "yes"):
+        from api.sim.seed_demo import main as seed_demo
+
+        try:
+            seed_demo()
+        except Exception as e:  # 데모 데이터 때문에 서버가 안 뜨는 일은 없어야 한다
+            print(f"[seed_demo] 건너뜀: {e}")
     yield
 
 

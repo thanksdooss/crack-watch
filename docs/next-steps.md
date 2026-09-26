@@ -12,13 +12,11 @@
 | 무엇 | 어디에 | 상태 |
 | --- | --- | --- |
 | 앱·서버·문서 전체 | `~/projects/crack-watch` | 커밋 10개, GitHub 연결 **아직 없음** |
-| 포트폴리오 케이스 | **`~/projects/portfolio-crack-watch`** (분리된 작업 공간, `content/crack-watch` 가지) | 커밋됨, `main`에 **아직 안 합침**, 푸시 안 함 |
+| 포트폴리오 케이스 | `~/projects/portfolio`의 `content/crack-watch` 가지 | 커밋됨, `main`에 **아직 안 합침**, 푸시 안 함 |
 | 배포 설정 파일 | `render.yaml`, `web/vercel.json`, `.github/workflows/ci.yml` | 준비 완료 |
 
-포트폴리오는 클린 팩토리 작업과 섞이지 않도록 **작업 공간을 따로 뒀다.**
-`~/projects/portfolio`(평소 쓰는 곳)는 건드리지 않고, 균열 감시 케이스는 `~/projects/portfolio-crack-watch`에서만 만진다.
-같은 저장소를 공유하는 두 번째 작업 폴더(git worktree)라 파일이 두 벌로 갈라지지 않는다.
-케이스 커밋이 건드린 파일은 `crack-watch` 관련 9개뿐이라 클린 팩토리와 **겹치는 파일이 없다.**
+포트폴리오 저장소에서는 지금 클린 팩토리 작업이 진행 중이다. 케이스 커밋이 건드리는 파일은 `crack-watch` 관련 9개뿐이라
+**겹치는 파일은 없지만**, 같은 저장소를 두 곳에서 동시에 만지면 헷갈리니 6단계는 클린 팩토리 작업이 일단락된 뒤에 한다.
 
 공개해도 되는지 미리 확인한 것: 올라갈 파일은 170개(8.9MB)이고, `PROMPT.md`·검사어 목록(`.privacy-terms`)·데이터셋·학습 데이터는 **빠져 있다**.
 샘플 사진은 전부 합성 이미지라 실제 건물이 찍힌 사진은 한 장도 없다.
@@ -154,8 +152,7 @@ Render 대시보드에서 `crack-watch-api` → **Environment** → `ADMIN_TOKEN
 - `README.md`의 "데모" 항목
 - 포트폴리오 케이스의 `links` (지금은 비어 있음)와 note의 "데모와 저장소 링크는 배포 후 추가합니다." 문장
 
-직접 하고 싶으면 `~/projects/portfolio-crack-watch/src/data/projects/crack-watch.js`의 `links: []` 를 아래처럼 바꾸면 된다
-(평소 쓰는 `~/projects/portfolio` 폴더가 아니라 **분리된 폴더**다).
+직접 하고 싶으면 `~/projects/portfolio`(가지: `content/crack-watch`)의 `src/data/projects/crack-watch.js`에서 `links: []` 를 아래처럼 바꾸면 된다.
 
 ```js
 links: [
@@ -168,41 +165,42 @@ links: [
 
 ## 6. 포트폴리오에 케이스 올리기 (10분)
 
-케이스는 분리된 작업 공간 `~/projects/portfolio-crack-watch`의 `content/crack-watch` 가지에 있다.
-최신 `main`(클린 팩토리 갱신 포함)을 이미 합쳐 두어서, 이 가지는 **"현재 사이트 + 균열 감시 케이스"** 상태다.
-**푸시하는 순간 공개 사이트에 뜬다.**
+케이스는 `~/projects/portfolio`의 `content/crack-watch` 가지에 커밋되어 있다(파일 9개, 전부 새 파일).
+**푸시하는 순간 공개 사이트에 뜬다.** 클린 팩토리 작업이 일단락된 뒤에 하는 게 좋다.
 
-### 6-1. 올리기 전에 한 번 읽어 보기
-
-분리된 폴더에서 미리보기를 띄운다(처음 한 번은 `npm install`이 몇 분 걸린다).
-
-```bash
-cd ~/projects/portfolio-crack-watch && npm install && npm run dev -- --port 5191
-```
-
-브라우저에서 `http://localhost:5191/portfolio/#/p/crack-watch` 를 열어 확인한다. 특히 세 가지:
-
-- 경력·역할 표현이 사실과 맞는지 (기획 3인 팀의 **팀원**, 구현은 단독)
-- 수상 표기가 없는지 (이 대회는 본인 이름 상장이 없어 일부러 뺐다)
-- 문장 톤이 본인 것 같은지
-
-고칠 부분이 있으면 알려 주면 내가 그 폴더에서 고친다. 확인이 끝나면 `Ctrl+C`로 미리보기를 끈다.
-
-### 6-2. main에 합치고 올리기
-
-클린 팩토리 쪽 작업이 일단락된 뒤에 하는 게 안전하다. 평소 쓰는 폴더에서:
+### 6-1. 저장 안 된 수정부터 정리
 
 ```bash
 cd ~/projects/portfolio && git status --short
 ```
 
-여기서 저장 안 된 수정(지금은 `skavoca.js`)이 보이면 **먼저 커밋하거나 되돌린 뒤** 진행한다. 그다음:
+지금은 `skavoca.js`가 수정 상태다. 먼저 커밋하거나 되돌린 뒤 다음으로 넘어간다.
+
+### 6-2. main에 합치고 눈으로 확인
 
 ```bash
 cd ~/projects/portfolio && git merge content/crack-watch
 ```
 
-"Fast-forward"라고 나오면 정상이다(충돌 없음). 올리기 전 마지막 확인:
+충돌 없이 합쳐진다(겹치는 파일이 없다). 그다음 미리보기로 케이스를 읽어 본다.
+
+```bash
+cd ~/projects/portfolio && npm run dev
+```
+
+`http://localhost:5173/portfolio/#/p/crack-watch` 를 열어 세 가지를 봐 달라:
+
+- 경력·역할 표현이 사실과 맞는지 (기획 3인 팀의 **팀원**, 구현은 단독)
+- 수상 표기가 없는지 (이 대회는 본인 이름 상장이 없어 일부러 뺐다)
+- 문장 톤이 본인 것 같은지
+
+고칠 부분이 있으면 알려 주면 내가 고친다. 마음에 안 들어 **통째로 되돌리려면** 푸시 전에:
+
+```bash
+cd ~/projects/portfolio && git reset --hard origin/main
+```
+
+### 6-3. 올리기
 
 ```bash
 cd ~/projects/portfolio && npm run build && npm run check:privacy dist
@@ -214,13 +212,7 @@ cd ~/projects/portfolio && npm run build && npm run check:privacy dist
 cd ~/projects/portfolio && git push
 ```
 
-### 6-3. 분리한 폴더 정리 (다 끝난 뒤)
-
-합치고 푸시까지 끝나면 분리 폴더는 지워도 된다(커밋은 저장소에 남는다).
-
-```bash
-cd ~/projects/portfolio && git worktree remove ../portfolio-crack-watch
-```
+푸시 뒤 `content/crack-watch` 가지는 역할이 끝나므로 `git branch -d content/crack-watch`로 지워도 된다.
 
 ## 7. 직접 재야 채워지는 숫자 (선택, 40분)
 
@@ -266,7 +258,7 @@ cd ~/projects/portfolio && git worktree remove ../portfolio-crack-watch
 
 | 내가 할 수 있음 | 직접 하셔야 함 |
 | --- | --- |
-| 링크를 README·포트폴리오에 넣기 | GitHub·Vercel·Render **계정 로그인과 생성** |
+| 링크를 README·포트폴리오 케이스에 넣기 | GitHub·Vercel·Render **계정 로그인과 생성** |
 | 사진을 주면 색 오차 표 채우기 | 배포 버튼 누르기(공개 행위라 본인 확인이 필요) |
-| 문구·내용 수정, 기능 추가 (분리 폴더에서) | 카드 인쇄와 벽 촬영, 자로 재기 |
+| 문구·내용 수정, 기능 추가 | 카드 인쇄와 벽 촬영, 자로 재기 |
 | 오류 메시지를 주면 원인 찾기 | 휴대폰에서 처리 시간 확인 |

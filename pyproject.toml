@@ -3,6 +3,8 @@ name = "crack-watch"
 version = "0.1.0"
 description = "시민 신고 기반 건물 균열 관찰 — API와 학습·평가 스크립트"
 requires-python = ">=3.11"
+# API가 실제로 쓰는 것만 둔다. 서버는 numpy·OpenCV를 쓰지 않는다(영상처리는 전부 기기 안에서 끝난다).
+# 서버리스 배포에서 묶음 크기와 시작 시간이 중요해서 가볍게 유지한다. 학습·평가용은 [cv]·[ml] 추가 설치.
 dependencies = [
     "fastapi>=0.115",
     "uvicorn[standard]>=0.34",
@@ -11,20 +13,24 @@ dependencies = [
     "sqlalchemy>=2.0",
     "alembic>=1.14",
     "psycopg[binary]>=3.2",  # 배포(PostgreSQL)
-    "numpy>=2.0",
-    "opencv-python-headless>=4.10",
-    "pillow>=11.0",
 ]
 
 [project.optional-dependencies]
-# 3단계(모델 학습)에서 설치한다. 지금 넣으면 수 GB가 필요 없이 깔린다.
-ml = ["torch>=2.5", "torchvision>=0.20", "onnx>=1.17", "onnxruntime>=1.20"]
+# 영상처리·평가 스크립트(ml/)용. API에는 필요 없다.
+cv = ["numpy>=2.0", "opencv-python-headless>=4.10", "pillow>=11.0"]
+# 모델 학습용. 수 GB라 필요할 때만 설치한다.
+ml = ["numpy>=2.0", "opencv-python-headless>=4.10", "pillow>=11.0",
+      "torch>=2.5", "torchvision>=0.20", "onnx>=1.17", "onnxruntime>=1.20"]
 
 [dependency-groups]
 dev = ["pytest>=8.3", "httpx>=0.28", "ruff>=0.9"]
 
 [tool.setuptools.packages.find]
 include = ["api*", "ml*"]
+
+[tool.vercel]
+# Vercel(서버리스)에 올릴 때의 진입점 — FastAPI 앱이 있는 곳
+entrypoint = "api.app.main:app"
 
 [tool.pytest.ini_options]
 testpaths = ["api/tests", "ml/tests"]

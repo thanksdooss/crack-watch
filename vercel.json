@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "$comment": "서버(FastAPI)를 Vercel 함수로 올릴 때 쓰는 설정. 웹은 web/vercel.json을 쓴다(프로젝트를 따로 만든다).",
+  "functions": {
+    "api/app/main.py": {
+      "excludeFiles": "{web/**,ml/**,data/**,docs/assets/**,shared/fixtures/**,.venv/**,**/__pycache__/**,**/*.onnx,**/*.pt}"
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "no-referrer" }
+      ]
+    }
+  ]
+}

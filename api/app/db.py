@@ -7,7 +7,7 @@ PostGIS 없이 동작하게 설계했다: 위치는 lat/lon + geohash 접두 인
 import os
 from collections.abc import Iterator
 
-from sqlalchemy import create_engine, event
+from sqlalchemy import NullPool, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 def normalize_db_url(url: str) -> str:
@@ -24,10 +24,22 @@ def normalize_db_url(url: str) -> str:
 
 DATABASE_URL = normalize_db_url(os.environ.get("DATABASE_URL", "sqlite:///./data/crack_watch.db"))
 
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {},
-)
+def _engine_kwargs(url: str) -> dict:
+    """서버리스(Vercel 함수)에서는 요청마다 프로세스가 새로 뜰 수 있다.
+
+    그때 커넥션을 붙잡아 두면 데이터베이스의 접속 수가 금방 바닥난다. Neon의 풀러 주소
+    (`...-pooler...`)를 쓰거나 서버리스로 판단되면 풀을 두지 않고, 끊긴 커넥션을 미리 걸러낸다.
+    """
+    if url.startswith("sqlite"):
+        return {"connect_args": {"check_same_thread": False}}
+    serverless = bool(os.environ.get("VERCEL")) or "-pooler" in url
+    kwargs: dict = {"pool_pre_ping": True}
+    if serverless:
+        kwargs["poolclass"] = NullPool
+    return kwargs
+
+
+engine = create_engine(DATABASE_URL, **_engine_kwargs(DATABASE_URL))
 if DATABASE_URL.startswith("sqlite"):
     @event.listens_for(engine, "connect")
     def _fk(dbapi_conn, _):  # noqa: ANN001

@@ -7,7 +7,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
-      - run: uv venv --python 3.11 && uv pip install -e . --group dev
+      # API는 가벼운 의존성만 쓴다. ml 테스트(색 보정·카드 검출·폭)는 [cv]가 필요하다.
+      - run: uv venv --python 3.11 && uv pip install -e ".[cv]" --group dev
       # ml 테스트 중 일부(카드 검출·색 보정)는 데이터셋 없이 돈다. 데이터셋이 필요한 평가는 CI에서 돌리지 않는다.
       - run: .venv/bin/python -m pytest -q
 

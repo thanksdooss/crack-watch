@@ -77,7 +77,9 @@ docs/    접근법, 아키텍처, 평가, 검증, 색 보정, 결정 기록
 
 ```bash
 # 파이썬 (API·학습·평가)
-uv venv --python 3.11 && uv pip install -e . --group dev
+uv venv --python 3.11
+uv pip install -e . --group dev              # API만 (가볍다 — 47MB)
+uv pip install -e ".[cv]" --group dev        # 평가·테스트까지 (OpenCV·numpy 추가)
 .venv/bin/uvicorn api.app.main:app --port 8000          # API (SQLite, 관리자 토큰 demo-admin)
 .venv/bin/python -m api.sim.seed_demo                   # 지도 체험용 합성 신고 넣기
 
@@ -91,7 +93,7 @@ npm run dev
 
 ```bash
 .venv/bin/python -m ml.datasets.download crackseg9k     # 약 2.8GB, 원 배포처에서
-uv pip install -e ".[ml]"
+uv pip install -e ".[ml]"                              # 학습용(PyTorch 등)
 .venv/bin/python -m ml.baseline.tune                    # 기준선 파라미터 (dev·val만)
 .venv/bin/python -m ml.train.train --epochs 10 --crop 256
 .venv/bin/python -m ml.export.onnx_export && .venv/bin/python -m ml.train.threshold --engine model-fp32
@@ -111,14 +113,19 @@ API 테스트는 `TEST_DATABASE_URL`로 PostgreSQL에서도 돈다.
 
 ## 배포
 
-- 웹 → Vercel: 루트 디렉터리 `web`, 환경 변수 `VITE_API_URL`=API 주소 (`web/vercel.json`)
-- API → Render: `render.yaml` 블루프린트. 데이터베이스는 **Neon**(무료 PostgreSQL, 만료 없음) — Render 무료 PostgreSQL은
-  30일 뒤 만료되어 쓰지 않는다. Render 대시보드에 `DATABASE_URL`(Neon 연결 문자열)과 `CORS_ORIGINS`(웹 주소)를 넣고,
-  `ADMIN_TOKEN`은 자동 생성. `SEED_DEMO=true`면 데이터베이스가 비어 있을 때만 합성 데모 신고를 채운다(운영은 `false`)
-- CI: `.github/workflows/ci.yml` — 공개 금지 단어 검사어는 저장소에 두지 않고 `PRIVACY_TERMS` 시크릿으로
-- 서버 깨우기: 무료 서버는 15분 뒤 잠든다. 앱이 열릴 때 `/health`를 미리 찔러 깨우고(`web/src/lib/api.ts`),
-  `.github/workflows/keep-warm.yml`이 평일 09~20시(KST) 14분마다 신호를 보낸다(저장소 변수 `API_URL` 필요).
-  시간대를 좁힌 이유는 Render 무료가 **계정당** 월 750 인스턴스 시간이기 때문이다 — 같은 계정의 다른 서비스와 나눠 쓴다
+```
+Vercel (웹: web/)  ──→  Vercel 함수 (서버: api/)  ──→  Neon (PostgreSQL)
+```
+
+- **웹** → Vercel 프로젝트, 루트 디렉터리 `web`, 환경 변수 `VITE_API_URL`=서버 주소 (`web/vercel.json`)
+- **서버** → 같은 저장소를 두 번째 Vercel 프로젝트로(루트 디렉터리는 저장소 루트). FastAPI가 Vercel 함수로 돈다
+  (`vercel.json`, `pyproject.toml`의 `[tool.vercel] entrypoint`). 환경 변수 `DATABASE_URL`·`ADMIN_TOKEN`·`CORS_ORIGINS`.
+  **요청이 올 때만 실행되므로 잠들지 않는다.** API 의존성은 가볍게 유지했다(설치 47MB — 영상처리는 전부 기기 안에서 끝난다)
+- **데이터베이스** → Neon 무료 PostgreSQL(만료 없음). 서버리스에서는 커넥션을 붙잡지 않도록 풀러 주소를 쓰고 `NullPool`로 붙는다.
+  Render 무료 PostgreSQL은 30일 뒤 만료되어 쓰지 않는다
+- **대안**: Render로도 올릴 수 있다(`render.yaml`). 다만 무료는 15분 뒤 잠들고(깨우기 워크플로 `keep-warm.yml` 포함),
+  무료 시간이 계정당 월 750시간이라 다른 서비스와 나눠 써야 한다 — 자세한 건 `docs/next-steps.md` 부록 A
+- **CI**: `.github/workflows/ci.yml` — 공개 금지 단어 검사어는 저장소에 두지 않고 `PRIVACY_TERMS` 시크릿으로
 
 ## 데이터셋과 라이선스
 

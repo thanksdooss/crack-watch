@@ -1,7 +1,7 @@
 # 다음에 할 일 — 배포와 마무리 안내
 
-개발은 끝났고, 여기 남은 건 **계정이 필요한 일**과 **직접 몸으로 해야 하는 측정**뿐이다.
-순서대로 따라 하면 된다. 각 단계에 걸리는 시간과 비용을 적어 두었다. 전부 무료 요금제로 된다.
+개발은 끝났다. 남은 건 **계정이 필요한 일**과 **직접 몸으로 해야 하는 측정**뿐이다.
+순서대로 따라 하면 된다. 전부 무료로 된다.
 
 > 막히면 그 단계 번호와 화면에 나온 문구를 그대로 알려 주면 된다.
 
@@ -11,58 +11,64 @@
 
 | 무엇 | 어디에 | 상태 |
 | --- | --- | --- |
-| 앱·서버·문서 전체 | `~/projects/crack-watch` | 커밋 10개, GitHub 연결 **아직 없음** |
-| 포트폴리오 케이스 | `~/projects/portfolio`의 `main` (다른 작업자가 병합 완료) | **푸시만 남음** |
-| 배포 설정 파일 | `render.yaml`, `web/vercel.json`, `.github/workflows/ci.yml` | 준비 완료 |
+| 앱·서버·문서 전체 | `~/projects/crack-watch` | 커밋 완료, GitHub 연결 **아직 없음** |
+| 포트폴리오 케이스 | 포트폴리오 저장소 `main` | **이미 공개됨.** 데모·저장소 링크만 비어 있다 |
+| 배포 설정 파일 | `vercel.json`(서버), `web/vercel.json`(웹), `render.yaml`(대안) | 준비 완료 |
 
-포트폴리오 저장소는 **다른 작업자가 맡고 있다.** 2026-09-26 기준으로 균열 감시 케이스는 이미 `main`에 병합됐고
-(충돌 없음), SKAVOCA 케이스 갱신 2건과 함께 **푸시만 남아 있다.** 이 저장소(crack-watch) 쪽에서는 포트폴리오 파일을 직접 고치지 않는다.
-
-공개해도 되는지 미리 확인한 것: 올라갈 파일은 170개(8.9MB)이고, `PROMPT.md`·검사어 목록(`.privacy-terms`)·데이터셋·학습 데이터는 **빠져 있다**.
+공개해도 되는지 미리 확인한 것: 올라갈 파일은 170개 남짓(8.9MB)이고
+`PROMPT.md`·검사어 목록(`.privacy-terms`)·데이터셋·학습 산출물은 **빠져 있다**.
 샘플 사진은 전부 합성 이미지라 실제 건물이 찍힌 사진은 한 장도 없다.
+
+### 배포 구조
+
+```
+[사람] → Vercel (웹: 화면·분석)  ──→  Vercel (서버: 신고 접수·지도)  ──→  Neon (데이터베이스)
+         같은 저장소의 web/ 폴더        같은 저장소를 한 번 더 가져옴        무료, 만료 없음
+```
+
+서버를 Vercel 함수로 올리면 **잠들지 않는다**(요청이 올 때만 실행된다).
+Render 무료 서버는 15분 뒤 잠들어 첫 접속이 1분씩 걸려서 쓰지 않는다 — 그래도 쓰고 싶다면 부록 A.
 
 ---
 
-## 1. GitHub에 저장소 만들기 (10분)
+## 1. GitHub에 저장소 만들기 (15분)
 
 ### 1-1. 공개로 할지 먼저 정한다
 
 - **공개(Public)**: 포트폴리오에서 코드 링크를 보여 줄 수 있다. 채용 담당자가 실제 코드를 본다.
-- **비공개(Private)**: 나중에 언제든 공개로 바꿀 수 있다. 다만 포트폴리오에 링크를 걸어도 남이 못 연다.
+- **비공개(Private)**: 나중에 공개로 바꿀 수 있지만, 포트폴리오에 링크를 걸어도 남이 못 연다.
 
-추천은 공개다. 이 저장소에는 비공개 정보가 들어가지 않도록 처음부터 걸러 두었다.
+추천은 공개다. 비공개 정보가 들어가지 않도록 처음부터 걸러 두었다.
 
 ### 1-2. 저장소 만들기
 
-브라우저에서 <https://github.com/new> 에 들어가:
+<https://github.com/new> 에서:
 
 - Repository name: `crack-watch`
-- Public / Private 중 선택
+- Public / Private 선택
 - **Add a README file 체크 해제** (이미 있다)
 - Create repository
 
 ### 1-3. 올리기
 
-터미널에서 아래를 차례로 실행한다(`<사용자이름>`은 본인 GitHub 아이디).
-
 ```bash
-cd ~/projects/crack-watch && git remote add origin https://github.com/<사용자이름>/crack-watch.git
+cd ~/projects/crack-watch && git remote add origin https://github.com/thanksdooss/crack-watch.git
 ```
 
 ```bash
-cd ~/projects/crack-watch && git branch -M main && git push -u origin main
+cd ~/projects/crack-watch && git push -u origin main
 ```
 
-**확인**: GitHub 저장소 페이지를 새로고침하면 README가 보이고, 화면 상단에 파일 목록이 나온다.
+**확인**: GitHub 저장소 페이지를 새로고침하면 README가 보인다.
 
-### 1-4. 자동 검사에 쓸 비밀값 등록 (5분)
+### 1-4. 자동 검사용 비밀값 등록
 
-빌드할 때마다 "공개하면 안 되는 단어"가 섞여 들어갔는지 검사하는 장치가 있다. 검사어 목록 자체가 비공개라 GitHub에 비밀값으로 넣어야 한다.
+빌드할 때마다 "공개하면 안 되는 단어"가 섞였는지 검사하는 장치가 있다. 검사어 목록 자체가 비공개라 비밀값으로 넣는다.
 
-1. 저장소 페이지 → **Settings** → 왼쪽 **Secrets and variables** → **Actions**
-2. **New repository secret** 클릭
+1. 저장소 → **Settings** → **Secrets and variables** → **Actions**
+2. **New repository secret**
 3. Name: `PRIVACY_TERMS`
-4. Secret: 아래 명령으로 나온 내용을 복사해 붙여넣기
+4. Secret: 아래 명령 결과를 복사해 붙여넣기
 
 ```bash
 cat ~/projects/crack-watch/.privacy-terms
@@ -70,41 +76,37 @@ cat ~/projects/crack-watch/.privacy-terms
 
 5. Add secret
 
-이걸 안 넣으면 GitHub의 자동 검사가 실패로 표시된다(코드에는 문제 없음).
+안 넣으면 자동 검사가 빨간 X로 뜬다(코드 문제는 아니다).
 
 ---
 
-## 2. 웹 배포 — Vercel (15분, 무료)
-
-브라우저에서 보이는 앱을 올린다. GitHub에 올린 코드를 Vercel이 가져가 자동으로 빌드한다.
+## 2. 웹 올리기 — Vercel (15분)
 
 ### 2-1. 계정 연결
 
-1. <https://vercel.com> 접속 → **Sign Up**(또는 Log In) → **Continue with GitHub** 선택
-2. GitHub가 권한을 물으면 **Authorize Vercel** 클릭
-3. 개인 용도이므로 Hobby(무료) 플랜을 고르고, 이름은 아무거나 적어도 된다
+1. <https://vercel.com> → **Sign Up**(또는 Log In) → **Continue with GitHub** → **Authorize**
+2. 개인 용도이므로 **Hobby(무료)** 플랜
 
 ### 2-2. 프로젝트 가져오기
 
-1. 화면 오른쪽 위 **Add New…** → **Project**
-2. `crack-watch` 저장소 줄의 **Import** 클릭
-   - 목록에 없으면: **Adjust GitHub App Permissions** → 저장소 접근 허용 → 돌아와서 새로고침
-3. **Configure Project** 화면이 뜬다. 여기서 **딱 하나만** 바꾼다:
+1. 오른쪽 위 **Add New…** → **Project**
+2. `crack-watch` 줄의 **Import**
+   - 목록에 없으면 **Adjust GitHub App Permissions** → 저장소 접근 허용
+3. **Configure Project** 화면에서 **딱 하나만** 바꾼다:
 
-| 항목 | 값 | 설명 |
-| --- | --- | --- |
-| Framework Preset | Vite | 자동으로 잡힌다. 그대로 |
-| **Root Directory** | **`web`** | ← **이것만 바꾼다.** Edit 버튼 → 목록에서 `web` 폴더 선택 → Continue |
-| Build Command | `npm run build` | 그대로 |
-| Output Directory | `dist` | 그대로 |
-| Environment Variables | 비워 둠 | 4단계에서 넣는다 |
+| 항목 | 값 |
+| --- | --- |
+| Project Name | `crack-watch` (그대로) |
+| Framework Preset | Vite (자동) — 그대로 |
+| **Root Directory** | **`web`** ← Edit → `web` 폴더 선택 → Continue |
+| Build / Output | 그대로 |
+| Environment Variables | 비워 둔다 (5단계에서 넣는다) |
 
-4. **Deploy** 클릭 → 1~3분 기다린다
+4. **Deploy** → 1~3분
 
 ### 2-3. 주소 확인
 
-배포가 끝나면 축하 화면과 함께 주소가 나온다(예: `https://crack-watch-abc123.vercel.app`).
-이 주소를 **적어 둔다** — 3단계에서 쓴다.
+`https://crack-watch-xxxx.vercel.app` 같은 주소가 나온다. **적어 둔다.**
 
 열어서 확인:
 
@@ -112,231 +114,197 @@ cat ~/projects/crack-watch/.privacy-terms
 - [ ] 샘플을 누르면 몇 초 뒤 결과가 나온다(처음 한 번은 모델 6.2MB를 받느라 느리다)
 - [ ] 결과에 "전문가 진단이 아닙니다" 안내가 있다
 
-> 이 단계에서 지도·관리자 화면이 비어 있는 건 **정상**이다. 서버가 아직 없다.
+> 지금은 지도·관리자 화면이 비어 있는 게 **정상**이다. 서버가 아직 없다.
 
-**Root Directory를 잘못 지정해 빌드가 실패했다면**: 프로젝트 → Settings → General → Root Directory를 `web`으로 고치고
-Deployments 탭에서 **Redeploy**.
+빌드가 실패했다면 Root Directory가 `web`인지 확인한다(Settings → General → Root Directory → 고친 뒤 Redeploy).
 
 ---
 
-## 3. 데이터베이스와 서버 배포 (30분, 무료)
+## 3. 데이터베이스 만들기 — Neon (15분)
 
-신고를 저장할 **데이터베이스(Neon)** 를 먼저 만들고, 그다음 **서버(Render)** 를 올린다.
+신고를 저장할 곳이다. Render의 무료 데이터베이스는 **30일이면 만료**되어 데모가 조용히 죽으므로,
+만료가 없는 Neon을 쓴다(SKAVOCA도 같은 이유로 Neon을 쓴다).
 
-> Render에도 무료 PostgreSQL이 있지만 **만든 지 30일이면 만료**된다. 포트폴리오 데모가 한 달 뒤 조용히 죽기 때문에
-> 만료가 없는 **Neon** 무료 PostgreSQL을 쓴다. SKAVOCA도 같은 이유로 Neon을 쓰고 있다.
+### 3-1. 데이터베이스 만들기
 
-### 3-1. Neon에서 데이터베이스 만들기 (10분)
+1. <https://neon.com> → **Sign up** → GitHub 로그인
+2. Project name `crack-watch`, Region은 **Singapore** 같은 가까운 곳
+3. **Create** → **Connection string**(연결 문자열)이 나온다
+4. `postgresql://` 로 시작하는 문자열을 **통째로 복사**해 둔다
+   - **비밀번호가 들어 있다.** 저장소·메신저에 붙여넣지 않는다(Vercel 설정에만 넣는다)
+   - 창을 닫았으면 프로젝트 → **Connect**에서 다시 볼 수 있다
+   - 선택지가 있으면 **Pooled connection**(주소에 `-pooler`가 들어간 것)을 고른다 — 서버리스에 맞다
 
-1. <https://neon.com> → **Sign up** → GitHub 계정으로 로그인
-2. 프로젝트 만들기 화면에서:
-   - Project name: `crack-watch`
-   - Postgres version: 기본값 그대로
-   - Region: **Asia Pacific (Singapore)** 처럼 가까운 곳 (Render도 싱가포르로 맞춘다)
-3. **Create** → 잠시 뒤 **Connection string**(연결 문자열)이 화면에 나온다
-4. `postgresql://` 로 시작하는 그 문자열을 **통째로 복사**해 둔다
-   - 예: `postgresql://user:비밀번호@ep-xxxx.ap-southeast-1.aws.neon.tech/neondb?sslmode=require`
-   - **비밀번호가 들어 있으니 남에게 보여 주지 않는다.** 저장소에도 넣지 않는다(Render에만 입력한다)
-   - 화면을 닫아 버렸으면: 프로젝트 → **Connect**(또는 Dashboard의 Connection Details)에서 다시 볼 수 있다
+### 3-2. 데모 데이터 한 번 넣기
 
-### 3-2. Render에 서버 올리기 (20분)
+지도·관리자 화면을 체험하려면 합성 신고가 필요하다. 내 컴퓨터에서 한 번만 넣으면 된다.
+아래 명령의 `<연결문자열>` 자리에 3-1에서 복사한 값을 붙여넣는다(따옴표 유지).
 
-1. <https://render.com> → **Get Started**(또는 Sign In) → **GitHub**로 로그인 → **Authorize Render**
-2. 대시보드 오른쪽 위 **New +** → **Blueprint**
-3. 저장소 목록에서 `crack-watch` → **Connect**
-   - 목록에 없으면 **Configure account**(또는 Install Render) → 저장소 접근 허용
-4. Render가 `render.yaml`을 읽어 **crack-watch-api** 서비스 하나를 보여 준다. Blueprint Name은 아무거나(예: `crack-watch`)
-5. 값을 물어보는 칸 두 개를 채운다:
+```bash
+cd ~/projects/crack-watch && DATABASE_URL='<연결문자열>' .venv/bin/python -m api.sim.seed_demo
+```
 
-| 칸 | 넣을 값 |
+`226건 넣음`이 나오면 성공이다(이미 들어 있으면 `이미 데이터가 있어 건너뛴다`라고 나온다).
+
+---
+
+## 4. 서버 올리기 — Vercel 함수 (15분)
+
+웹과 **같은 저장소**를 두 번째 프로젝트로 한 번 더 가져온다. 이번엔 파이썬 서버로 인식된다.
+
+### 4-1. 관리자 열쇠 만들기
+
+관리자 화면에 들어갈 때 쓸 비밀번호다. 아래 명령으로 무작위 값을 만들어 **복사해 둔다**.
+
+```bash
+python3 -c "import secrets; print(secrets.token_urlsafe(24))"
+```
+
+### 4-2. 두 번째 프로젝트 만들기
+
+1. Vercel → **Add New…** → **Project** → 같은 `crack-watch` 저장소 **Import**
+2. **Project Name**: `crack-watch-api` (웹 프로젝트와 이름이 달라야 한다)
+3. **Root Directory**: **저장소 루트 그대로 둔다**(`web`으로 바꾸지 않는다)
+4. Framework Preset: 자동 감지에 맡긴다(Other로 나와도 된다)
+5. **Environment Variables**에 세 개를 넣는다:
+
+| Key | Value |
 | --- | --- |
-| `DATABASE_URL` | 3-1에서 복사한 Neon 연결 문자열 (그대로 붙여넣기) |
-| `CORS_ORIGINS` | 2-3에서 적어 둔 Vercel 주소 (예: `https://crack-watch-abc123.vercel.app`, **끝에 `/` 없이**) |
+| `DATABASE_URL` | 3-1에서 복사한 Neon 연결 문자열 |
+| `ADMIN_TOKEN` | 4-1에서 만든 무작위 값 |
+| `CORS_ORIGINS` | 2-3의 웹 주소 (예: `https://crack-watch-xxxx.vercel.app`, **끝에 `/` 없이**) |
 
-6. **Apply**(또는 Create Resources) → 첫 빌드 5~10분(파이썬 라이브러리 설치)
+6. **Deploy** → 2~4분
 
-### 3-3. 주소와 관리자 열쇠 확인
+### 4-3. 확인
 
-1. 빌드가 끝나면 서비스 페이지 위쪽 주소를 **적어 둔다**(예: `https://crack-watch-api-xxxx.onrender.com`)
-2. 왼쪽 **Environment** 탭 → `ADMIN_TOKEN` 줄의 눈 모양 아이콘 → 값을 **복사해 안전한 곳에** 둔다
-   (관리자 화면 열쇠다. 남에게 주지 않는다)
-3. 브라우저에서 `https://<서버주소>/health` → `{"status":"ok"}` 가 나오면 성공
-4. `https://<서버주소>/sites` 를 열면 데모 지점 목록(JSON)이 보인다 — 서버가 처음 켜질 때 합성 신고 226건을 자동으로 넣는다
+배포가 끝나면 `https://crack-watch-api-xxxx.vercel.app` 같은 주소가 나온다. **적어 둔다.**
 
-### 3-4. 서버가 잠드는 문제 — 세 겹으로 대응한다
+- `https://<서버주소>/health` → `{"status":"ok"}`
+- `https://<서버주소>/sites` → 지점 목록(JSON)이 쭉 나온다 (3-2에서 넣은 데모 데이터)
 
-Render 무료 서버는 **15분간 접속이 없으면 잠들고**, 다음 접속 때 깨어나는 데 1분쯤 걸린다. 그대로 두면 면접관이 링크를 열었을 때
-빈 지도를 보게 된다. 세 가지를 같이 쓴다.
+둘 다 되면 서버가 살아 있는 것이다. **잠들지 않으므로 깨울 필요도 없다.**
 
-1. **앱이 열리면 미리 깨운다(구현 완료).** 웹을 여는 순간 서버에 신호를 보낸다. 사용자가 안내 문구를 읽고 샘플을 고르는
-   동안 서버가 일어나므로, 지도 탭에 갈 때쯤이면 대개 준비돼 있다. 실패해도 분석은 기기 안에서 도니까 아무 문제 없다.
-2. **기다리는 이유를 화면에 쓴다(구현 완료).** 지도가 느리면 "무료 서버가 잠들어 있으면 깨어나는 데 1분쯤 걸립니다"라고 알린다.
-3. **평일 낮에는 계속 깨워 둔다(설정 필요).** `.github/workflows/keep-warm.yml`이 14분마다 신호를 보낸다.
-   배포가 끝나면 저장소에 주소를 등록해야 동작한다:
+---
 
-   저장소 → **Settings** → **Secrets and variables** → **Actions** → **Variables** 탭 → **New repository variable**
-   - Name: `API_URL`
-   - Value: 3-3에서 적어 둔 Render 주소 (예: `https://crack-watch-api-xxxx.onrender.com`, 끝에 `/` 없이)
+## 5. 웹과 서버 연결 (10분)
 
-   등록하지 않으면 이 작업은 그냥 넘어간다(오류 아님).
+웹이 아직 서버 주소를 모른다.
 
-> **왜 SKAVOCA처럼 08:00~24:00으로 안 하나:** Render 무료는 **워크스페이스(계정)당 월 750시간**이 한도다. 서비스마다 750시간이 아니다.
-> SKAVOCA가 이미 하루 16시간(월 약 480시간)을 쓰고 있어서, crack-watch까지 같은 시간대로 깨우면 합계 960시간이 되어 **두 서비스가 같이 멈춘다.**
-> 그래서 이 프로젝트는 **평일 09:00~19:59**(월 약 220시간)만 깨운다. 합계 약 700시간으로 한도 안이다.
-> 시간대를 넓히고 싶으면 SKAVOCA 쪽을 줄이거나, Render 계정(워크스페이스)을 나눠야 한다.
+1. Vercel → **웹** 프로젝트(`crack-watch`) → **Settings** → **Environment Variables**
+2. 입력:
 
-### 3-5. 그 밖에 알아 둘 것
-
-- 데이터는 Neon에 있으므로 **서버가 잠들거나 재배포돼도 신고가 사라지지 않는다.**
-- 데모 데이터는 **비어 있을 때 한 번만** 들어간다. 재시작해도 중복으로 쌓이지 않는다(확인함).
-- 실제 운영으로 전환하려면 Render의 `SEED_DEMO`를 `false`로 바꾸고 Neon에서 데모 데이터를 지우면 된다.
-- Neon 무료는 만료가 없지만, 오래 접속이 없으면 데이터베이스도 잠깐 잠든다(첫 요청이 몇 초 느려진다).
-
-## 4. 웹과 서버 연결 (5분)
-
-웹은 아직 서버 주소를 모른다. 알려 주고 다시 배포하면 지도·관리자 화면이 살아난다.
-
-1. Vercel 대시보드 → `crack-watch` 프로젝트 → 위쪽 **Settings** 탭
-2. 왼쪽 메뉴 **Environment Variables**
-3. 입력:
-
-| 칸 | 넣을 값 |
+| 칸 | 값 |
 | --- | --- |
 | Key | `VITE_API_URL` |
-| Value | 3-3에서 적어 둔 Render 주소 (예: `https://crack-watch-api-xxxx.onrender.com`, **끝에 `/` 없이**) |
-| Environments | 전부 체크(Production·Preview·Development) |
+| Value | 4-3의 서버 주소 (**끝에 `/` 없이**) |
+| Environments | 전부 체크 |
 
-4. **Save**
-5. 위쪽 **Deployments** 탭 → 맨 위 배포 오른쪽 **⋯** → **Redeploy**
-   - "Use existing Build Cache" 체크는 **해제**하는 편이 확실하다
-   - 다시 1~3분
+3. **Save**
+4. **Deployments** 탭 → 맨 위 배포 **⋯** → **Redeploy** (Build Cache 체크 해제 권장) → 1~3분
 
-> 환경 변수는 **빌드할 때** 앱에 박히기 때문에, 저장만 하고 다시 배포하지 않으면 반영되지 않는다.
+> 환경 변수는 **빌드할 때** 앱에 박힌다. 저장만 하고 재배포하지 않으면 반영되지 않는다.
 
-### 4-1. 최종 확인 (5분)
+### 5-1. 최종 확인
 
 웹 주소를 새로 열어서:
 
 - [ ] **분석**: 샘플 → 결과가 나오고 균열이 주황색으로 표시된다
-- [ ] **지도·이력**: 빨간 점들이 보인다(서버가 잠들어 있으면 1분 뒤 새로고침)
+- [ ] **지도·이력**: 빨간 점들이 보인다
 - [ ] 점을 누르면 아래에 폭 변화 그래프가 나온다
-- [ ] **관리자**: 3-3에서 복사한 토큰 입력 → 불러오기 → 보류된 신고와 "걸러 낸 비율"이 보인다
+- [ ] **관리자**: 4-1의 토큰 입력 → 불러오기 → 보류된 신고와 "걸러 낸 비율"이 보인다
 - [ ] 샘플 분석 → **신고하기** → 위치 동의 → 접수된다
 
-다 되면 주소 두 개(웹·서버)와 GitHub 주소를 알려 달라. README와 포트폴리오 케이스에 넣을 링크를 정리해 주겠다.
+---
 
-## 5. 링크를 문서와 포트폴리오에 넣기 (내가 대신 할 수 있음)
+## 6. 링크 채우기
 
-주소 두 개(웹·서버)와 GitHub 주소를 알려 주면 내가 다음을 수정한다.
+주소 세 개(웹·서버·GitHub)를 알려 주면 내가 다음을 정리한다.
 
-- `README.md`의 "데모" 항목
-- 포트폴리오 케이스의 `links` (지금은 비어 있음)와 note의 "데모와 저장소 링크는 배포 후 추가합니다." 문장
+- 이 저장소 `README.md`의 "데모" 항목 — 내가 직접 고친다
+- 포트폴리오 케이스의 `links`와 note의 "데모와 저장소 링크는 배포 후 추가합니다." 문장 —
+  포트폴리오 저장소는 다른 작업자가 맡고 있으므로 **바꿀 내용만 만들어 전달**한다
 
-포트폴리오 저장소는 다른 작업자가 맡고 있으므로, 나는 **바꿀 내용만 아래처럼 만들어 전달**한다.
-직접 넣으려면 `~/projects/portfolio/src/data/projects/crack-watch.js`의 `links: []` 를 이렇게 바꾸고,
-`note`의 마지막 줄("데모와 저장소 링크는 배포 후 추가합니다.")을 지우면 된다.
+직접 넣으려면 포트폴리오의 `src/data/projects/crack-watch.js`에서:
 
 ```js
 links: [
   { label: '데모', url: 'https://crack-watch-xxxx.vercel.app' },
-  { label: 'GitHub', url: 'https://github.com/<사용자이름>/crack-watch' },
+  { label: 'GitHub', url: 'https://github.com/thanksdooss/crack-watch' },
 ],
 ```
 
 ---
 
-## 6. 포트폴리오에 케이스 올리기 (5분)
-
-**병합은 이미 끝났다**(다른 작업자가 처리). `~/projects/portfolio`의 `main`이 GitHub보다 커밋 4개 앞서 있다.
-
-| 커밋 | 내용 |
-| --- | --- |
-| `5566891` | SKAVOCA 케이스 Spring Boot 버전 정정 |
-| `f6e0f3a` | 균열 감시 케이스 병합 |
-| `56bb476` | SKAVOCA 케이스 지표를 측정값으로 교체 |
-| `ff08d05` | 균열 감시 케이스 추가 |
-
-### 6-1. 올리기 전 확인
-
-```bash
-cd ~/projects/portfolio && npm run dev
-```
-
-`http://localhost:5173/portfolio/#/p/crack-watch` 에서 세 가지를 봐 달라:
-
-- 경력·역할 표현이 사실과 맞는지 (기획 3인 팀의 **팀원**, 구현은 단독)
-- 수상 표기가 없는지 (이 대회는 본인 이름 상장이 없어 일부러 뺐다)
-- 문장 톤이 본인 것 같은지
-
-### 6-2. 올리기 — 이걸 하면 공개 사이트에 뜬다
-
-```bash
-cd ~/projects/portfolio && git push
-```
-
-### 6-3. 되돌리기 (푸시 전에만)
-
-균열 감시 케이스만 빼고 SKAVOCA 작업은 남기려면:
-
-```bash
-cd ~/projects/portfolio && git reset --hard 5566891
-```
-
-`git reset --hard origin/main`은 쓰지 않는다 — 다른 작업자의 SKAVOCA 갱신까지 함께 사라진다.
-
 ## 7. 직접 재야 채워지는 숫자 (선택, 40분)
 
-문서에 "미측정"으로 비워 둔 칸들이다. 채우면 "합성 실험" 대신 "실제 측정"이라고 쓸 수 있다.
-안 해도 앱은 동작한다. 다만 면접에서 "실제로 재 봤나요?"라는 질문에 답이 생긴다.
+문서에 "미측정"으로 비워 둔 칸이다. 채우면 "합성 실험" 대신 "실제 측정"이라고 쓸 수 있다.
+안 해도 앱은 동작한다. 다만 면접에서 "실제로 재 봤나요?"에 답이 생긴다.
 
-### 7-1. 색 보정 실측 (제일 값어치 있음)
-
-준비물: 프린터, 자, 무늬 없는 콘크리트·시멘트 벽(주차장·옥상·담장이면 충분하다)
-
-1. `web/public/reference-card.pdf`를 **배율 100%**(‘페이지에 맞춤’ 끄기)로 인쇄한다
-2. 자로 카드의 가로 막대가 **정확히 60mm**인지 잰다. 다르면 인쇄 설정을 고쳐 다시 뽑는다
-3. 카드를 벽에 평평하게 붙인다(휘지 않게, 그늘지지 않게)
-4. **같은 자리**에서 세 번 찍는다 — ① 낮 야외 ② 실내 형광등 ③ 해질 무렵이나 백열등
-5. 사진 3장을 주면 내가 보정 전후 색 오차를 계산해 표를 채운다
-
-### 7-2. 폭 실측
-
-균열이 있는 벽이 있다면, 카드를 옆에 붙이고 찍은 뒤 **자(또는 균열 게이지)로 같은 자리의 폭**을 재서 알려 주면, 앱 추정값과 실제 값을 비교한 표를 만든다. 균열을 못 찾으면 이 항목은 건너뛴다.
-
-### 7-3. 휴대폰 처리 시간 (5분, 제일 쉬움)
+### 7-1. 휴대폰 처리 시간 (5분 — 제일 쉽다)
 
 1. 휴대폰으로 배포한 웹 주소를 연다
 2. 샘플 하나를 눌러 분석한다
-3. 결과 화면의 **측정 근거 → 처리 시간**에 나오는 숫자(예: `6144 ms (…)`)를 알려 준다
-4. 기종(예: 갤럭시 S22, 아이폰 13)도 함께 알려 주면 표에 기기명을 넣는다
+3. 결과 화면의 **측정 근거 → 처리 시간** 숫자(예: `6144 ms (…)`)와 **기종**을 알려 준다
+
+### 7-2. 색 보정 실측 (30분 — 제일 값어치 있다)
+
+준비물: 프린터, 자, 무늬 없는 콘크리트 벽(주차장·옥상·담장이면 충분)
+
+1. `web/public/reference-card.pdf`를 **배율 100%**(‘페이지에 맞춤’ 끄기)로 인쇄
+2. 자로 카드의 가로 막대가 **정확히 60mm**인지 확인. 다르면 인쇄 설정을 고쳐 다시 뽑는다
+3. 카드를 벽에 평평하게 붙인다(휘지 않게, 그늘 없이)
+4. **같은 자리**에서 세 번 촬영 — ① 낮 야외 ② 실내 형광등 ③ 해질 무렵이나 백열등
+5. 사진 3장을 주면 보정 전후 색 오차 표를 채운다
+
+### 7-3. 폭 실측
+
+균열이 있는 벽이 있으면 카드를 옆에 붙여 찍고, **자나 균열 게이지로 같은 자리의 폭**을 재서 알려 주면
+앱 추정값과 실제 값을 비교한 표를 만든다.
 
 ---
 
-## 8. 자주 묻는 상황
+## 8. 문제가 생기면
 
 | 증상 | 원인과 해결 |
 | --- | --- |
-| 지도·관리자 화면이 비어 있다 | 4단계(환경 변수 + 재배포)를 안 했거나, 서버가 잠들어 있다. 서버 주소 `/health`를 먼저 열어 깨운다 |
-| 관리자 화면에서 "401" | 토큰이 틀렸다. Render의 `ADMIN_TOKEN` 값을 다시 복사한다 |
-| 신고가 "데모 모드"로만 저장된다 | 웹이 서버 주소를 모른다. Vercel 환경 변수 확인 후 재배포 |
-| GitHub의 자동 검사가 빨간 X | `PRIVACY_TERMS` 비밀값이 없을 때 그렇다(1-4단계). 코드 문제가 아니다 |
-| 첫 분석이 오래 걸린다 | 처음 한 번은 모델 파일(6.2MB)을 받는다. 두 번째부터는 빠르다 |
-| 지도는 되는데 신고가 안 들어간다 | `CORS_ORIGINS`(Render)에 적은 웹 주소가 실제 주소와 다르거나 끝에 `/`가 붙었다 |
-| Render 로그에 `psycopg2` 오류 | `DATABASE_URL`을 Neon에서 복사한 그대로 넣었는지 확인(형식 변환은 코드가 알아서 한다) |
-| Render 로그에 `could not connect` | Neon 연결 문자열이 잘렸거나 `?sslmode=require`가 빠졌다. Neon에서 다시 복사 |
-| Vercel 빌드 실패 "No such file" | Root Directory가 `web`이 아니다. Settings → General에서 고치고 Redeploy |
-| Render 배포가 빨간색 | 서비스 → Logs에서 마지막 줄을 복사해 알려 달라 |
-| 며칠 뒤 지도가 비었다 | 서버가 잠들어 있다. 1분 뒤 새로고침. 데이터는 Neon에 남아 있다 |
-| 밤·주말에 링크를 열면 느리다 | 깨우기가 평일 09~20시만 돈다(750시간 한도 때문). 중요한 자리 전에 미리 한 번 열어 두면 된다 |
-| Render에서 "instance hours" 경고 | 같은 계정의 다른 서비스와 750시간을 나눠 쓴다. keep-warm 시간대를 줄이거나 계정을 나눈다 |
+| 웹 빌드 실패 "No such file" | Root Directory가 `web`이 아니다(2-2) |
+| 서버 배포 실패 | 서버 프로젝트의 Root Directory는 **저장소 루트**여야 한다(4-2). `web`으로 두면 파이썬을 못 찾는다 |
+| `/health`가 404 | 서버가 아니라 웹 주소를 열었다. 주소 두 개를 헷갈리기 쉽다 |
+| 지도·관리자가 비어 있다 | 5단계(환경 변수 + 재배포)를 안 했다 |
+| 신고가 "데모 모드"로만 저장된다 | 같은 원인. `VITE_API_URL` 확인 후 재배포 |
+| 지도는 뜨는데 신고가 안 들어간다 | `CORS_ORIGINS`(서버)에 적은 웹 주소가 실제와 다르거나 끝에 `/`가 붙었다 |
+| 서버 로그에 `could not connect` | Neon 연결 문자열이 잘렸거나 `?sslmode=require`가 빠졌다. Neon에서 다시 복사 |
+| 서버 로그에 `psycopg2` 오류 | Neon에서 복사한 주소를 그대로 넣었는지 확인(형식 변환은 코드가 알아서 한다) |
+| 관리자 화면 "401" | `ADMIN_TOKEN` 값이 다르다. Vercel 서버 프로젝트의 환경 변수와 맞춰 본다 |
+| GitHub 자동 검사가 빨간 X | `PRIVACY_TERMS` 비밀값이 없다(1-4). 코드 문제가 아니다 |
+| 첫 분석이 오래 걸린다 | 처음 한 번만 모델 6.2MB를 받는다. 두 번째부터 빠르다 |
 
 ---
 
-## 9. 내가 할 수 있는 일 / 직접 하셔야 하는 일
+## 9. 누가 무엇을 하나
 
 | 내가 할 수 있음 | 직접 하셔야 함 |
 | --- | --- |
-| 이 저장소 README에 링크 넣기 · 케이스 수정안 만들기 | GitHub·Vercel·Render **계정 로그인과 생성** |
-| 사진을 주면 색 오차 표 채우기 | 배포 버튼 누르기(공개 행위라 본인 확인이 필요) |
-| 문구·내용 수정, 기능 추가 | 카드 인쇄와 벽 촬영, 자로 재기 |
-| 오류 메시지를 주면 원인 찾기 | 휴대폰에서 처리 시간 확인 |
+| README 링크 넣기, 케이스 수정안 만들기 | GitHub·Vercel·Neon **계정 로그인과 생성** |
+| 사진을 주면 색 오차 표 채우기 | **배포 버튼 누르기**(공개 행위라 본인 확인이 필요) |
+| 문구·기능 수정, 오류 원인 찾기 | 카드 인쇄와 벽 촬영, 자로 재기 |
+| — | 휴대폰에서 처리 시간 확인 |
+
+---
+
+## 부록 A. Render로 올리는 방법 (대안)
+
+Vercel 대신 Render에 서버를 올릴 수도 있다. `render.yaml`이 준비돼 있어 **New + → Blueprint**로 한 번에 만들어진다.
+다만 무료 요금제에는 두 가지 제약이 있다.
+
+1. **15분간 접속이 없으면 잠든다.** 다음 접속 때 깨는 데 1분쯤 걸린다.
+   - 앱이 열릴 때 서버를 미리 깨우는 장치는 이미 들어 있다(`web/src/lib/api.ts`의 `warmUp`).
+   - `.github/workflows/keep-warm.yml`이 평일 09~20시(KST) 14분마다 깨운다. 저장소 **Variables**에
+     `API_URL`(서버 주소)을 등록해야 동작한다.
+2. **무료 시간은 계정당 월 750시간**이다(서비스별이 아니다). 같은 계정의 SKAVOCA가 하루 16시간을 깨워 두면
+   월 약 480시간을 쓴다. 그래서 이 프로젝트의 깨우기는 평일 낮(월 약 220시간)으로 좁혀 두었다.
+   합계 약 700시간으로 한도 안이다.
+
+Vercel 함수로 올리면 이 제약이 둘 다 없어진다(요청이 올 때만 실행되고, 깨울 필요가 없다).
+그래서 본문은 Vercel 기준으로 적었다.
